@@ -1,0 +1,156 @@
+##---------------------------------------------------------------------------------------------------------------------------##
+###############################################################################################################################
+##---------------------------------------------------------------------------------------------------------------------------##
+
+
+#+TITLE: mhpLaTeX – Development Notes
+
+#+AUTHOR: Michael H. Pock
+
+#+EMAIL: mhp77@gmx.at
+
+#+LINK_HOME: http://orgmode.org
+
+#+TEXT: © Copyleft 2012-2013 MHP
+
+#+OPTIONS: num:2 toc:2
+
+#+OPTIONS: ^:nil -:nil TeX:nil LaTeX:nil
+
+#+EXPORT_EXCLUDE_TAGS: old
+
+
+* Before Committing …
+
+  - Increment the version number and update the release date in
+    mhpinfo.sty.
+  - Update the release date in master-mhp*.tex.
+
+
+* Development Cycle
+
+*** Example: mhpLaTeX 1.0
+
+    | Alpha Phase – Major Changes |    | Beta Phase – Minor Changes |    | Release Phase – Bug Fixes |
+    |-----------------------------+----+----------------------------+----+---------------------------|
+    | <c>                         |    | <c>                        |    | <c>                       |
+    | /                           | <> |                            | <> |                           |
+    | mhpLaTeX 1.0-A00            |    |                            |    |                           |
+    | mhpLaTeX 1.0-A01            |    |                            |    |                           |
+    | ↓                           |    |                            |    |                           |
+    | mhpLaTeX 1.0-A99            | →  | mhpLaTeX 1.0-B00           |    |                           |
+    |                             |    | mhpLaTeX 1.0-B01           |    |                           |
+    |                             |    | ↓                          |    |                           |
+    | mhpLaTeX 1.1-A00            | ←  | mhpLaTeX 1.0-B99           | →  | mhpLaTeX 1.0              |
+    |                             |    |                            |    | mhpLaTeX 1.0a             |
+    |                             |    |                            |    | ↓                         |
+    |                             |    |                            |    | mhpLaTeX 1.0z             |
+
+
+* Tasks
+
+** Bugs
+
+   - [ ] \terminal, \abbreviation: Looking ahead for \csq@qclose does
+     not work anymore.
+
+** Features
+
+   - [X] Re-implement \entity based on \detokenize.
+   - [ ] Integrate the [[http://mirror.ctan.org/macros/latex/contrib/microtype/microtype.pdf][microtype]] package.
+   - [ ] Integrate the [[http://mirror.ctan.org/macros/latex/contrib/caption/newfloat.pdf][newfloat]] package.
+   - [ ] Integrate the [[http://mirror.ctan.org/macros/latex/contrib/algorithms/algorithms.pdf][algorithmic]] package.
+   - [ ] Replace the supertabular package with the [[http://mirror.ctan.org/macros/latex/contrib/xtab/xtab.pdf][xtab]] package.
+   - [ ] Set up the shorthand character " for all languages. Define "@
+     as shorthand for \terminal, "| as shorthand for biblatex’s
+     \noligature etc.
+   - [ ] Add a global option allowing to load the hyperref package
+     manually after the mhplatex package.
+   - [ ] Build in a test that issues an error message if the running TeX
+     engine is not supported.
+   - [ ] Implement a fully expandable macro testing two fully expanded
+     character strings for equality (see [[http://tex.stackexchange.com/questions/59565][StackExchange]]). Use this macro
+     in \version.
+   - [ ] Include an argument processor in \newabbreviation that replaces
+     each occurrence of ~ with a configurable amount of horizontal
+     space. Make \abbreviation internal and provide for abbreviations
+     lacking a terminal dot (such as Mr). Check whether defining
+     abbreviations as slash-delimited macros is viable.
+   - [ ] Patch \bfseries to include \boldmath.
+   - [ ] Set the space factor code of \textquotedblright to 0 (see
+     [[http://tex.stackexchange.com/questions/59390][StackExchange]]).
+   - [ ] Integrate the [[http://mirror.ctan.org/macros/latex/contrib/currfile/currfile.pdf][currfile]] package. Include the name of the current
+     file in \DocumentWarning and \CommandWarning.
+   - [ ] Make \email and \ctanurl compatible with \urldef.
+   - [ ] Increase the distance between footer text and footer separation
+     line (see [[http://www.komascript.de/node/1552][KOMA-Script]]).
+   - [ ] Implement \mhpsetup.
+   - [ ] Provide a <key>=<value> interface for \newaddressbookentry.
+
+** Maintenance
+
+   - [X] Remove the most superfluous of the end-of-line comment
+     characters.
+   - [ ] Replace \patchcmd with \xpatchcmd where using the former
+     requires some workaround (see [[http://tex.stackexchange.com/questions/58965][StackExchange]]).
+   - [ ] Restructure the mhpmain package such that required packages are
+     set up immediately after loading them.
+   - [ ] Try to make code relying on potentially unstable internal
+     macros more robust. The following internal macros might be
+     unstable:
+     - \scr@ext@activate@title
+     - \ps@@{scrplain,scrheadings}
+     - \@ordinal{F,M,N}ngerman
+     - \@tododisplay
+     - \HyOrg@maketitle
+     - \hyper@normalise
+
+
+* Packages of Potential Interest
+
+  - [[http://mirror.ctan.org/macros/latex/contrib/oberdiek/accsupp.pdf][accsupp]]
+  - [[http://mirror.ctan.org/macros/latex/contrib/answers/answers.pdf][answers]]
+  - [[http://mirror.ctan.org/macros/latex/contrib/bezos/babeltools.pdf][babeltools]]
+  - [[http://mirror.ctan.org/macros/latex/contrib/bashful/bashful.pdf][bashful]]
+  - [[http://mirror.ctan.org/macros/latex/contrib/cfr-lm/doc/fonts/cfr-lm/cfr-lm.pdf][cfr-lm]]
+  - [[http://mirror.ctan.org/macros/latex/contrib/cprotect/cprotect.pdf][cprotect]]
+  - [[http://mirror.ctan.org/macros/latex/contrib/datatool/datatool.pdf][datatool]]
+  - [[http://mirror.ctan.org/macros/latex/contrib/oberdiek/embedfile.pdf][embedfile]]
+  - [[http://mirror.ctan.org/macros/latex/contrib/enumitem/enumitem.pdf][enumitem]]
+  - [[http://mirror.ctan.org/macros/latex/contrib/floatrow/floatrow.pdf][floatrow]]
+  - [[http://mirror.ctan.org/macros/latex/contrib/flowfram/ffuserguide.pdf][flowfram]]
+  - [[http://mirror.ctan.org/macros/latex/contrib/footnotebackref/footnotebackref.pdf][footnotebackref]]
+  - [[http://mirror.ctan.org/macros/latex/contrib/geometry/geometry.pdf][geometry]]
+  - [[http://mirror.ctan.org/macros/latex/contrib/imakeidx/imakeidx.pdf][imakeidx]] + [[http://mirror.ctan.org/macros/latex/contrib/idxlayout/idxlayout.pdf][idxlayout]]
+  - [[http://mirror.ctan.org/macros/latex/contrib/layouts/layman.pdf][layouts]]
+  - [[http://mirror.ctan.org/macros/latex/contrib/oberdiek/listingsutf8.pdf][listingsutf8]]
+  - [[http://mirror.ctan.org/macros/latex/contrib/marginnote/marginnote.pdf][marginnote]]
+  - [[http://mirror.ctan.org/macros/latex/contrib/nowidow/nowidow.pdf][nowidow]]
+  - [[http://mirror.ctan.org/macros/latex/contrib/ntheorem/ntheorem.pdf][ntheorem]] + [[http://mirror.ctan.org/macros/latex/exptl/thmtools/thmtools.pdf][thmtools]]
+  - [[http://mirror.ctan.org/macros/latex/contrib/slantsc/slantsc.pdf][slantsc]]
+  - [[http://mirror.ctan.org/macros/generic/systeme/systeme_doc_fr.pdf][systeme]]
+  - [[http://mirror.ctan.org/macros/latex/contrib/tabu/tabu.pdf][tabu]]
+  - [[http://mirror.ctan.org/macros/latex/contrib/tabulary/tabulary.pdf][tabulary]]
+
+
+-----
+
+
+* Old Tasks                                                        :old:
+
+
+-----
+
+
+##---------------------------------------------------------------------------------------------------------------------------##
+
+
+## LocalWords: mhpinfo mhp tex detokenize boldmath bfseries mhpsetup lm
+## LocalWords: textquotedblright newaddressbookentry ctanurl urldef cfr
+## LocalWords: hyperref DocumentWarning CommandWarning biblatex’s xtab
+## LocalWords: noligature mhplatex patchcmd xpatchcmd StackExchange
+## LocalWords: mhpmain scrheadings newabbreviation microtype newfloat
+## LocalWords: supertabular currfile accsupp babeltools cprotect tabu
+## LocalWords: datatool enumitem embedfile floatrow imakeidx tabulary
+## LocalWords: footnotebackref idxlayout listingsutf marginnote nowidow
+## LocalWords: ntheorem thmtools slantsc systeme

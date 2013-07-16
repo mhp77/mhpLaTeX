@@ -1,0 +1,323 @@
+%%---------------------------------------------------------------------------------------------------------------------------%%
+%%###########################################################################################################################%%
+%%---------------------------------------------------------------------------------------------------------------------------%%
+%%
+%%
+%% Abstract:
+%%   LaTeX package mhptools provides various tools for setting up the mhpLaTeX document preparation framework.
+%%
+%% Details:
+%%   None.
+%%
+%% References:
+%% - LaTeX 2ε for class and package writers
+%%   --> http://mirror.ctan.org/macros/latex/doc/clsguide.pdf
+%% - The LaTeX 2ε Sources
+%%   --> http://mirror.ctan.org/macros/latex/doc/source2e.pdf
+%% - List of Internal LaTeX 2ε Macros Useful to Package Authors
+%%   --> http://mirror.ctan.org/info/macros2e/macros2e.pdf
+%% - TeX by Topic
+%%   --> http://mirror.ctan.org/info/texbytopic/TeXbyTopic.pdf
+%% - The pdfTeX user manual
+%%   --> http://mirror.ctan.org/systems/pdftex/pdftex-a.pdf
+%%
+%% TODO:
+%%   None.
+%%
+%% Author:
+%%   Michael H. Pock || MHP || mhp77@gmx.at
+%%
+%% © Copyleft 2012-2013 MHP
+%%
+%%
+%%---------------------------------------------------------------------------------------------------------------------------%%
+%%###########################################################################################################################%%
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\RequirePackage{mhpinfo}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\def\mhp@mhptools{%
+  mhptools%
+}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\NeedsTeXFormat{LaTeX2e}[\mhp@TexFormatReleaseDate]
+
+
+\ProvidesPackage{\mhp@mhptools}[\mhp@ReleaseInfo]
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\newcommand*{\mhp@macro@a}{}
+
+
+\newlength{\mhp@length@a}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\@ifpackageloaded{silence}{
+}{
+  \RequirePackage[debrief]{silence}[2012/07/02]
+  %% --> http://mirror.ctan.org/macros/latex/contrib/silence/silence-doc.pdf
+}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\RequirePackage{ifpdf}[2011/01/30]
+%% --> http://mirror.ctan.org/macros/latex/contrib/oberdiek/ifpdf.pdf
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\RequirePackage{scrlfile}[2012/06/15]
+%% --> http://mirror.ctan.org/macros/latex/contrib/koma-script/doc/scrguien.pdf
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\RequirePackage{scrbase}[2012/07/29]
+%% --> http://mirror.ctan.org/macros/latex/contrib/koma-script/doc/scrguien.pdf
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\RequirePackage{etoolbox}[2011/01/03]
+%% --> http://mirror.ctan.org/macros/latex/contrib/etoolbox/etoolbox.pdf
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\RequirePackage{ltxcmds}[2011/11/09]
+%% --> http://mirror.ctan.org/macros/latex/contrib/oberdiek/ltxcmds.pdf
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\RequirePackage{expl3}[2012/11/21]
+%% --> http://mirror.ctan.org/macros/latex/contrib/l3kernel/expl3.pdf
+%% --> http://mirror.ctan.org/macros/latex/contrib/l3kernel/interface3.pdf
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\RequirePackage{xstring}[2010/03/28]
+%% --> http://mirror.ctan.org/macros/latex/contrib/xstring/xstring_doc_en.pdf
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\RequirePackage{pdftexcmds}[2011/11/29]
+%% --> http://mirror.ctan.org/macros/latex/contrib/oberdiek/pdftexcmds.pdf
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\RequirePackage[log-declarations=false]{xparse}[2012/11/21]
+%% --> http://mirror.ctan.org/macros/latex/contrib/l3packages/xparse.pdf
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\RequirePackage{suffix}[2006/07/15]
+%% --> http://mirror.ctan.org/macros/latex/contrib/bigfoot/suffix.pdf
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\RequirePackage{letltxmacro}[2010/09/02]
+%% --> http://mirror.ctan.org/macros/latex/contrib/oberdiek/letltxmacro.pdf
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\RequirePackage{environ}[2008/06/18]
+%% --> http://mirror.ctan.org/macros/latex/contrib/environ/environ.pdf
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\RequirePackage{regexpatch}[2012/06/07]
+%% --> http://mirror.ctan.org/macros/latex/contrib/regexpatch/regexpatch.pdf
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\RequirePackage{calc}[2007/08/22]
+%% --> http://mirror.ctan.org/macros/latex/required/tools/calc.pdf
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\RequirePackage{chngcntr}[2009/09/02]
+%% --> http://mirror.ctan.org/macros/latex/contrib/chngcntr/chngcntr.pdf
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\RequirePackage{kvoptions}[2011/06/30]
+%% --> http://mirror.ctan.org/macros/latex/contrib/oberdiek/kvoptions.pdf
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\RequirePackage{ifdraft}[2008/08/11]
+%% --> http://mirror.ctan.org/macros/latex/contrib/oberdiek/ifdraft.pdf
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\RequirePackage{iflang}[2007/11/11]
+%% --> http://mirror.ctan.org/macros/latex/contrib/oberdiek/iflang.pdf
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\RequirePackage{filecontents}[2011/10/08]
+%% --> http://mirror.ctan.org/macros/latex/contrib/filecontents/filecontents.pdf
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\newcommand*{\PackageWarningFailedPatching}[2]{%
+  \PackageWarning{#1}{Patching command \protect#2 failed}%
+}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\newcommand*{\DocumentWarning}[1]{%
+  \GenericWarning{}{Document \jobname\space Warning: #1}%
+}
+
+
+\newcommand*{\DocumentError}[2]{%
+  \GenericError{}{Document \jobname\space Error: #1}{\ltx@gobble}{#2}%
+}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\newcommand*{\CommandWarning}[2]{%
+  \GenericWarning{}{Command \protect#1 Warning: #2}%
+}
+
+
+\newcommand*{\CommandError}[3]{%
+  \GenericError{}{Command \protect#1 Error: #2}{\ltx@gobble}{#3}%
+}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\newcommand*{\NotExpandArgument}[1]{%
+  \def\ProcessedArgument{\unexpanded{#1}}%
+}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\ExplSyntaxOn
+
+
+%% NOTE: \NotExpandArgument provides for active characters in the argument.
+\NewDocumentCommand{\executeshellcmd}{>{\NotExpandArgument}v}{
+  \ifnumequal{\pdf@shellescape}{0}{
+    \CommandWarning{\executeshellcmd}{
+      Shell~commands~forbidden.~Not~executing~`#1'
+    }
+    \pdf@system{#1}
+  }{
+    \ifnumequal{\pdf@shellescape}{1}{
+      \CommandWarning{\executeshellcmd}{
+        Shell~commands~allowed.~Executing~`#1'
+      }
+      \pdf@system{#1}
+    }{
+      \ifnumequal{\pdf@shellescape}{2}{
+        \CommandWarning{\executeshellcmd}{
+          Safe~shell~commands~allowed.~Trying~to~execute~`#1'
+        }
+        \pdf@system{#1}
+      }{
+        \CommandWarning{\executeshellcmd}{
+          Status~of~shell~commands~unclear~(\protect\pdf@shellescape-->\number\pdf@shellescape).~Not~trying~to~execute~`#1'
+        }
+      }
+    }
+  }
+}
+
+
+\ExplSyntaxOff
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\newcommand*{\ifscreen}{}
+\let\ifscreen\ltx@secondoftwo
+
+
+\DeclareOption{print}{%
+  \let\ifscreen\ltx@secondoftwo
+}
+
+
+\DeclareOption{screen}{%
+  \let\ifscreen\ltx@firstoftwo
+}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\ProcessOptions*
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\endinput
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+%% LocalWords: mhptools NotExpandArgument

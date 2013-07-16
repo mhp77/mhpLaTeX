@@ -1,0 +1,449 @@
+%%
+%% This is file `l3dt.sty',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% l3dt.dtx  (with options: `package')
+%% 
+%% EXPERIMENTAL CODE
+%% 
+%% Do not distribute this file without also distributing the
+%% source files specified above.
+%% 
+%% Do not distribute a modified version of this file.
+%% 
+%% File l3dt.dtx Copyright (C) 2011,2012 The LaTeX3 Project
+%%
+%% It may be distributed and/or modified under the conditions of the
+%% LaTeX Project Public License (LPPL), either version 1.3c of this
+%% license or (at your option) any later version.  The latest version
+%% of this license is in the file
+%%
+%%    http://www.latex-project.org/lppl.txt
+%%
+%% This file is part of the "l3experimental bundle" (The Work in LPPL)
+%% and all files in that bundle must be distributed together.
+%%
+%% The released version of this bundle is available from CTAN.
+%%
+%% -----------------------------------------------------------------------
+%%
+%% The development version of the bundle can be found at
+%%
+%%    http://www.latex-project.org/svnroot/experimental/trunk/
+%%
+%% for those people who are interested.
+%%
+%%%%%%%%%%%
+%% NOTE: %%
+%%%%%%%%%%%
+%%
+%%   Snapshots taken from the repository represent work in progress and may
+%%   not work or may contain conflicting material!  We therefore ask
+%%   people _not_ to put them into distributions, archives, etc. without
+%%   prior consultation with the LaTeX Project Team.
+%%
+%% -----------------------------------------------------------------------
+%%
+\RequirePackage{expl3}
+\GetIdInfo$Id: l3dt.dtx 4190 2012-09-03 00:23:31Z bruno $
+  {L3 Experimental data tables}
+\ProvidesExplPackage
+  {\ExplFileName}{\ExplFileDate}{\ExplFileVersion}{\ExplFileDescription}
+\quark_new:N \q__dt
+\quark_new:N \q__dt_row
+\quark_new:N \q__dt_header
+\tl_const:Nn \c_empty_dt
+  {
+    { 0 }
+    { 0 }
+    \q__dt
+    \q_nil
+    \q__dt_header
+    \q__dt_row
+  }
+\cs_new_protected:Npn \dt_new:N #1 { \cs_new_eq:NN #1 \c_empty_dt }
+\cs_new_protected:Npn \dt_clear:N #1  { \cs_set_eq:NN  #1 \c_empty_dt }
+\cs_new_protected:Npn \dt_gclear:N #1 { \cs_gset_eq:NN #1 \c_empty_dt }
+\cs_new_protected:Npn \dt_clear_new:N #1
+  { \cs_if_exist:NTF #1 { \dt_clear:N #1 } { \dt_new:N #1 } }
+\cs_new_protected:Npn \dt_gclear_new:N #1
+  { \cs_if_exist:NTF #1 { \dt_gclear:N #1 } { \dt_new:N #1 } }
+\cs_new_eq:NN \dt_set_eq:NN  \tl_set_eq:NN
+\cs_new_eq:NN \dt_gset_eq:NN \tl_gset_eq:NN
+\dt_new:N \l_tmpa_dt
+\dt_new:N \l_tmpb_dt
+\dt_new:N \g_tmpa_dt
+\dt_new:N \g_tmpb_dt
+\cs_new_protected:Npn \__dt_split:nnnn #1#2#3#4 { #3 #2 }
+\cs_new_protected:Npn \__dt_split:w { }
+\cs_new:Npn \__dt_split_header:NT #1#2
+  { \exp_after:wN \__dt_split_header:wn #1 \q_stop {#2} }
+\cs_new:Npn \__dt_split_header:wn #1 \q_nil \q__dt_header #2 \q_stop #3
+  { #3 {#1} { \q__dt_header #2 } }
+\cs_new_protected:Npn \__dt_split_key:nnTF #1#2
+  { \exp_args:No \__dt_split_key_aux:nnTF { \tl_to_str:n {#2} } {#1} }
+\cs_new_protected:Npn \__dt_split_key_aux:nnTF #1#2
+  {
+    \cs_set_protected:Npn \__dt_split:w
+      ##1 \q__dt #1 \q__dt ##2##3##4 \q_mark ##5 \q_stop
+      { \__dt_split:nnnn ##3 { { ##1 \q__dt } {##2} {##4} } }
+    \__dt_split:w #2 \q_mark
+      \q__dt #1 \q__dt { } { ? \use_ii:nn { } } \q_mark \q_stop
+  }
+\cs_new_protected:Npn \__dt_split_key_list:NnTF #1#2
+  { \exp_args:NNo \__dt_split_key_list_aux:NnTF #1 { \tl_to_str:n {#2} } }
+\cs_new_protected:Npn \__dt_split_key_list_aux:NnTF #1#2
+  {
+    \cs_set_protected:Npn \__dt_split:w
+      ##1##2##3 \q__dt #2 \q__dt ##4##5 \q__dt_header ##6 \q_mark ##7 \q_stop
+      {
+        \__dt_split:nnnn ##4
+          { { {##1} {##2} ##3 \q__dt } { ##4##5 \q__dt_header ##6 } }
+      }
+    \exp_after:wN \__dt_split:w #1 \q_mark
+      \q__dt #2 \q__dt { ? \use_ii:nn { } } \q__dt_header \q_mark \q_stop
+  }
+\cs_new_protected:Npn \__dt_split_row:NnTF #1#2
+  { \__dt_split_row_aux:NfTF #1 { \int_eval:n {#2} } }
+\cs_new_protected:Npn \__dt_split_row_aux:NnTF #1#2
+  {
+    \cs_set_protected:Npn \__dt_split:w
+      ##1 \q__dt_row #2 \q__dt ##2##3 \q__dt_row ##4 \q_mark ##5 \q_stop
+      {
+        \__dt_split:nnnn ##2
+          { { ##1 \q__dt_row } { #2 \q__dt ##2##3 } {##4} }
+      }
+    \exp_after:wN \__dt_split:w #1 \q_mark
+      \q__dt_row #2 \q__dt { ? \use_ii:nn { } } \q__dt_row \q_mark \q_stop
+  }
+\cs_generate_variant:Nn \__dt_split_row_aux:NnTF { Nf }
+\cs_new_protected_nopar:Npn \dt_add_key:Nn { \__dt_add_key:NNn \tl_set:Nx }
+\cs_new_protected_nopar:Npn \dt_gadd_key:Nn { \__dt_add_key:NNn \tl_gset:Nx }
+\cs_new_protected:Npn \__dt_add_key:NNn #1#2#3
+  {
+    \__dt_split_key_list:NnTF #2 {#3}
+      { \use_none:nn }
+      {
+        \__dt_split_header:NT #2
+          { \__dt_add_key:NNnnn #1 #2 {#3} }
+      }
+  }
+\cs_new_protected:Npn \__dt_add_key:NNnnn #1#2#3#4#5
+  { \__dt_add_key:NNnnnwnn #1 #2 #4 \q_stop {#3} {#5} }
+\cs_new_protected:Npn \__dt_add_key:NNnnnwnn #1#2#3#4#5 \q_stop #6#7
+  {
+    #1 #2
+      {
+        {#3}
+        { \int_eval:n { #4 + \c_one } }
+        \exp_not:n {#5}
+        \tl_to_str:n {#6}
+        \exp_not:n { \q__dt \q_nil #7 }
+      }
+  }
+\cs_new_protected_nopar:Npn \dt_add_row:N { \__dt_add_row:NN \tl_set:Nx }
+\cs_new_protected_nopar:Npn \dt_gadd_row:N { \__dt_add_row:NN \tl_gset:Nx }
+\cs_new_protected:Npn \__dt_add_row:NN #1#2
+  { \__dt_add_row:NfN #1 { \int_eval:n { \dt_rows:N #2 + \c_one } } #2 }
+\cs_new_protected:Npn \__dt_add_row:NnN #1#2#3
+  {
+    #1 #3
+      {
+        {#2}
+        \exp_after:wN \__dt_add_row:nw #3 \q_stop
+        #2
+        \exp_not:n { \q__dt \q_nil \q__dt_row }
+      }
+  }
+\cs_generate_variant:Nn \__dt_add_row:NnN { Nf }
+\cs_new:Npn \__dt_add_row:nw #1#2 \q_stop { \exp_not:n {#2} }
+\cs_new_protected:Npn \dt_put:Nnn #1
+  { \dt_put:Nnnn #1 { \dt_rows:N #1 } }
+\cs_new_protected:Npn \dt_gput:Nnn #1
+  { \dt_gput:Nnnn #1 { \dt_rows:N #1 } }
+\cs_new_protected_nopar:Npn \dt_put:Nnnn
+  { \__dt_put:NNNnnn \dt_add_key:Nn \tl_set:Nx }
+\cs_new_protected_nopar:Npn \dt_gput:Nnnn
+  { \__dt_put:NNNnnn \dt_gadd_key:Nn \tl_gset:Nx }
+\cs_new_protected:Npn \__dt_put:NNNnnn #1#2#3#4#5#6
+  {
+    #1 #3 {#5}
+    \__dt_split_row:NnTF #3 {#4}
+      { \__dt_put:NNnnnnn #2 #3 {#5} {#6} }
+      {
+        \__msg_kernel_error:nnxxx { dt } { unknown-row }
+          { \token_to_str:N #3 } { \int_eval:n {#4} } { \dt_rows:N #3 }
+      }
+  }
+\cs_new_protected:Npn \__dt_put:NNnnnnn #1#2#3#4#5#6#7
+  {
+    \__dt_split_key:nnTF {#6} {#3}
+      { \__dt_put_update:NNnnnnnnn #1 #2 {#3} {#4} {#5} {#7} }
+      { \__dt_put_add_to_row:NNnnnnn #1 #2 {#3} {#4} {#5} {#6} {#7} }
+  }
+\cs_new_protected:Npn \__dt_put_update:NNnnnnnnn #1#2#3#4#5#6#7#8#9
+  {
+    #1 #2
+      {
+        \exp_not:n { #5 #7 }
+        \tl_to_str:n {#3}
+        \exp_not:n { \q__dt {#4} \q__dt #9 \q__dt_row #6 }
+      }
+  }
+\cs_new_protected:Npn \__dt_put_add_to_row:NNnnnnn #1#2#3#4#5#6#7
+  {
+    #1 #2
+      {
+        \exp_not:n {#5}
+        \exp_not:o { \__dt_put_add_to_row_aux:w #6 }
+        \tl_to_str:n {#3}
+        \exp_not:n { \q__dt {#4} \q__dt \q_nil \q__dt_row #7 }
+      }
+  }
+\cs_new:Npn \__dt_put_add_to_row_aux:w #1 \q_nil {#1}
+\cs_new:Npn \dt_keys:N #1 { \exp_after:wN \__dt_keys:nnw #1 \q_stop }
+\cs_new:Npn \__dt_keys:nnw #1#2#3 \q_stop {#2}
+\cs_new:Npn \dt_rows:N #1
+  { \exp_after:wN \use_i_delimit_by_q_stop:nw #1 \q_stop }
+\cs_new_protected:Npn \dt_remove:Nn #1
+  { \dt_remove:Nnn #1 { \dt_rows:N #1 } }
+\cs_new_protected:Npn \dt_gremove:Nn #1
+  { \dt_gremove:Nnn #1 { \dt_rows:N #1 } }
+\cs_new_protected_nopar:Npn \dt_remove:Nnn { \dt_remove_aux:NNnn \tl_set:Nn }
+\cs_new_protected_nopar:Npn \dt_gremove:Nnn { \dt_remove_aux:NNnn \tl_gset:Nn }
+\cs_new_protected:Npn \dt_remove_aux:NNnn #1#2#3#4
+  {
+    \__dt_split_row:NnTF #2 {#3}
+      { \dt_remove_aux:NNnnnn #1 #2 {#4} }
+      { }
+  }
+\cs_new_protected:Npn \dt_remove_aux:NNnnnn #1#2#3#4#5#6
+  {
+    \__dt_split_key:nnTF {#5} {#3}
+      { \dt_remove_aux:NNnnnnn #1 #2 {#4} {#6} }
+      { }
+  }
+\cs_new_protected:Npn \dt_remove_aux:NNnnnnn #1#2#3#4#5#6#7
+  { #1 #2 { #3 #5 #7 #4 } }
+\cs_new_protected_nopar:Npn \dt_remove_key:Nn
+  { \dt_remove_key_aux:NNn \tl_set:Nx }
+\cs_new_protected_nopar:Npn \dt_gremove_key:Nn
+  { \dt_remove_key_aux:NNn \tl_gset:Nx }
+\cs_new_protected:Npn \dt_remove_key_aux:NNn #1#2#3
+  {
+    \__dt_split_key_list:NnTF #2 {#3}
+      { \exp_args:No \dt_remove_key_aux:nNNnn { \tl_to_str:n {#3} } #1 #2 }
+      { }
+  }
+\cs_new_protected:Npn \dt_remove_key_aux:nNNnn #1#2#3#4#5
+  { \dt_remove_key_aux:nNNnnwn {#1} #2 #3 #4 \q_stop {#5} }
+\cs_new_protected:Npn \dt_remove_key_aux:nNNnnwn #1#2#3#4#5#6 \q_stop #7
+  {
+    \cs_set:Npn \dt_remove_key_aux:w ##1 \q__dt #1 \q__dt ##2 ##3
+      {
+        \exp_not:n {##1}
+        \__quark_if_recursion_tail_break:nN {##3} \dt_map_break:
+        \dt_remove_key_aux:w ##3
+      }
+
+    #2 #3
+      {
+        {#4}
+        { \int_eval:n { #5 - \c_one } }
+        \exp_not:n {#6}
+        \dt_remove_key_aux:w #7 \q__dt #1 \q__dt { } \q_recursion_tail
+          \__prg_break_point:Nn \dt_map_break: { }
+      }
+  }
+\cs_new:Npn \dt_remove_key_aux:w { }
+\cs_new_protected_nopar:Npn \dt_remove_row:Nn
+  { \dt_remove_row_aux:NNn \tl_set:Nx }
+\cs_new_protected_nopar:Npn \dt_gremove_row:Nn
+  { \dt_remove_row_aux:NNn \tl_gset:Nx }
+\cs_new_protected:Npn \dt_remove_row_aux:NNn #1#2#3
+  {
+    \__dt_split_row:NnTF #2 {#3}
+      { \dt_remove_row_aux:NNnnn #1 #2 }
+      { }
+  }
+\cs_new_protected:Npn \dt_remove_row_aux:NNnnn #1#2#3#4#5
+  {
+    #1 #2
+      {
+        { \int_eval:n { \dt_rows:N #2 - \c_one } }
+        \dt_remove_row_aux:nw #3 \q_stop
+        \dt_remove_row_loop:nw #5 \q_recursion_tail \q__dt_row
+          \__prg_break_point:Nn \dt_map_break: { }
+      }
+  }
+\cs_new_eq:NN \dt_remove_row_aux:nw \__dt_add_row:nw
+\cs_new:Npn \dt_remove_row_loop:nw #1#2 \q__dt_row
+  {
+    \__quark_if_recursion_tail_break:nN {#1} \dt_map_break:
+    \int_eval:n { #1 - \c_one }
+    \exp_not:n { #2 \q__dt_row }
+    \dt_remove_row_loop:nw
+  }
+\cs_new_protected:Npn \dt_get:NnnN #1#2#3#4
+  {
+    \__dt_split_row:NnTF #1 {#2}
+      { \dt_get_aux:nNnnn {#3} #4 }
+      { \tl_set:Nn #4 { \q_no_value } }
+  }
+\cs_new_protected:Npn \dt_get_aux:nNnnn #1#2#3#4#5
+  {
+    \__dt_split_key:nnTF {#4} {#1}
+      { \dt_get_aux:Nnnn #2 }
+      { \tl_set:Nn #2 { \q_no_value } }
+  }
+\cs_new_protected:Npn \dt_get_aux:Nnnn #1#2#3#4 { \tl_set:Nn #1 {#3} }
+\prg_new_protected_conditional:Npnn \dt_get:NnnN #1#2#3#4 { T , F , TF }
+  {
+    \__dt_split_row:NnTF #1 {#2}
+      { \__dt_get_true:nNnnn {#3} #4 }
+      { \prg_return_false: }
+  }
+\cs_new_protected:Npn \__dt_get_true:nNnnn #1#2#3#4#5
+  {
+    \__dt_split_key:nnTF {#4} {#1}
+      { \__dt_get_true:Nnnn #2 }
+      { \prg_return_false: }
+  }
+\cs_new_protected:Npn \__dt_get_true:Nnnn #1#2#3#4
+  {
+    \tl_set:Nn #1 {#3}
+    \prg_return_true:
+  }
+\cs_new_protected:Npn \dt_get:NnN #1
+  { \dt_get:NnnN  #1 { \dt_rows:N #1 } }
+\cs_new_protected:Npn \dt_get:NnNT #1
+  { \dt_get:NnnNF  #1 { \dt_rows:N #1 } }
+\cs_new_protected:Npn \dt_get:NnNF #1
+  { \dt_get:NnnNF  #1 { \dt_rows:N #1 } }
+\cs_new_protected:Npn \dt_get:NnNTF #1
+  { \dt_get:NnnNTF #1 { \dt_rows:N #1 } }
+\int_new:N \g_dt_map_level_int
+\cs_new_protected:Npn \dt_map_variables:Nnn #1#2#3
+  {
+    \int_gincr:N \g_dt_map_level_int
+    \seq_gclear_new:c { g_dt_map_ \int_use:N \g_dt_map_level_int _seq }
+    \keyval_parse:NNn \use_none:n \__dt_map_variables_key:nn {#2}
+    \__dt_split_header:NT #1 { \__dt_map_variables:nnn {#3} }
+  }
+\cs_new_protected:Npn \__dt_map_variables_key:nn #1#2
+  {
+    \seq_gput_right:cn { g_dt_map_ \int_use:N \g_dt_map_level_int _seq }
+      { {#1} #2 }
+  }
+\cs_new_protected:Npn \__dt_map_variables:nnn #1#2#3
+  { \__dt_map_variables:nNNw {#1} #3 \q_stop }
+\cs_new_protected:Npn \__dt_map_variables:nNNw
+  #1 \q__dt_header \q__dt_row #2 \q_stop
+  {
+    \int_zero_new:c { l_dt_map_ \int_use:N \g_dt_map_level_int _row_int }
+    \__dt_map_variables:nnw {#1} #2 { } \q_recursion_tail \q__dt_row
+      \__prg_break_point:Nn \dt_map_break:
+        { \int_gdecr:N \g_dt_map_level_int }
+  }
+\cs_new_protected:Npn \__dt_map_variables:nnw #1#2#3#4 \q__dt_row
+  {
+    \__quark_if_recursion_tail_break:nN {#3} \dt_map_break:
+    \seq_map_inline:cn { g_dt_map_ \int_use:N \g_dt_map_level_int _seq }
+      { \dt_get_aux:nNnnn ##1 { } {#3#4} { } }
+    #1
+    \int_incr:c { l_dt_map_ \int_use:N \g_dt_map_level_int _row_int }
+    \__dt_map_variables:nnw {#1}
+  }
+\cs_new_nopar:Npn \dt_map_break:
+  { \__prg_map_break:Nn \dt_map_break: { } }
+\cs_new_nopar:Npn \dt_map_break:n
+  { \__prg_map_break:Nn \dt_map_break: }
+\prg_new_conditional:Npnn \dt_if_empty:N #1 { T , F , TF , p }
+  {
+    \if_meaning:w #1 \c_empty_dt
+      \prg_return_true:
+    \else:
+      \prg_return_false:
+    \fi:
+  }
+\prg_new_conditional:Npnn \dt_if_in:Nn #1#2 { p , T , F , TF }
+  { \__dt_split_header:NT #1 { \__dt_if_in:nnn {#2} } }
+\cs_new:Npn \__dt_if_in:nnn #1#2#3
+  {
+    \exp_last_unbraced:Nno \__dt_if_in:nwN {#1} { \use_none:nn #2 }
+      \q_recursion_tail \q__dt
+      \__prg_break_point:
+  }
+\cs_new:Npn \__dt_if_in:nwN #1#2 \q__dt
+  {
+    \if_meaning:w \q_recursion_tail #2
+      \exp_after:wN \__prg_break:n
+    \else:
+      \exp_after:wN \use_none:n
+    \fi:
+      { \prg_return_false: }
+    \str_if_eq:nnTF {#1} {#2}
+      { \__prg_break:n { \prg_return_true: } }
+      { \__dt_if_in:nwN {#1} }
+  }
+\prg_new_conditional:Npnn \dt_if_in_row:Nnn #1#2#3 { p , T , F , TF }
+  {
+    \exp_last_unbraced:Nno \__dt_if_in_row:nw {#2} #1
+      \q_recursion_tail \q_nil
+      \__prg_break_point:
+      { \tl_to_str:n {#3} }
+  }
+\cs_new:Npn \__dt_if_in_row:nw #1#2 \q__dt_row #3#4 \q_nil
+  {
+    \if_meaning:w \q_recursion_tail #3
+      \exp_after:wN \__prg_break:n
+    \else:
+      \exp_after:wN \use_none:n
+    \fi:
+      {
+        \use_i:nn
+        \prg_return_false:
+      }
+    \int_compare:nNnTF {#1} = {#3}
+      { \__prg_break:n { \exp_args:Nno \__dt_if_in_row:nn {#4} } }
+      { \__dt_if_in_row:nw {#1} }
+  }
+\cs_new:Npn \__dt_if_in_row:nn #1#2
+  {
+    \__dt_if_in_row:nwn {#2} #1 {#2} \q__dt { } \q_recursion_tail
+      \__prg_break_point:
+  }
+\cs_new:Npn \__dt_if_in_row:nwn #1 \q__dt #2 \q__dt #3
+  {
+    \str_if_eq:xxTF {#1} {#2}
+      { \__dt_if_in_row:N }
+      { \__dt_if_in_row:nwn {#1} }
+  }
+\cs_new:Npn \__dt_if_in_row:N #1
+  {
+    \if_meaning:w \q__dt #1
+      \prg_return_true:
+    \else:
+      \prg_return_false:
+    \fi:
+    \__prg_break:
+  }
+\cs_new:Npn \dt_if_in_row_p:Nn #1
+  { \dt_if_in_row_p:Nnn #1 { \dt_rows:N #1 } }
+\cs_new:Npn \dt_if_in_row:NnT  #1
+  { \dt_if_in_row:NnnT  #1 { \dt_rows:N #1 } }
+\cs_new:Npn \dt_if_in_row:NnF  #1
+  { \dt_if_in_row:NnnF  #1 { \dt_rows:N #1 } }
+\cs_new:Npn \dt_if_in_row:NnTF #1
+  { \dt_if_in_row:NnnTF #1 { \dt_rows:N #1 } }
+\__msg_kernel_new:nnnn { dt } { unknown-row }
+  { Data~table~#1~does~not~contain~a~row~'#2'. }
+  {
+    Data~table~#1~contains~#3~rows.~These~must~be~accessed~by~number:~row~
+    #2~is~not~present~in~the~table.
+  }
+%% 
+%%
+%% End of file `l3dt.sty'.

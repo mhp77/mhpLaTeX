@@ -1,0 +1,689 @@
+%%---------------------------------------------------------------------------------------------------------------------------%%
+%%###########################################################################################################################%%
+%%---------------------------------------------------------------------------------------------------------------------------%%
+%%
+%%
+%% Abstract:
+%%   LaTeX package mhpmisc defines miscellaneous commands and environments for the mhpLaTeX document preparation framework.
+%%
+%% Details:
+%%   None.
+%%
+%% References:
+%% - LaTeX 2ε for class and package writers
+%%   --> http://mirror.ctan.org/macros/latex/doc/clsguide.pdf
+%% - The LaTeX 2ε Sources
+%%   --> http://mirror.ctan.org/macros/latex/doc/source2e.pdf
+%% - List of Internal LaTeX 2ε Macros Useful to Package Authors
+%%   --> http://mirror.ctan.org/info/macros2e/macros2e.pdf
+%% - TeX by Topic
+%%   --> http://mirror.ctan.org/info/texbytopic/TeXbyTopic.pdf
+%% - The pdfTeX user manual
+%%   --> http://mirror.ctan.org/systems/pdftex/pdftex-a.pdf
+%%
+%% TODO:
+%%   None.
+%%
+%% Author:
+%%   Michael H. Pock || MHP || mhp77@gmx.at
+%%
+%% © Copyleft 2012-2013 MHP
+%%
+%%
+%%---------------------------------------------------------------------------------------------------------------------------%%
+%%###########################################################################################################################%%
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\RequirePackage{mhpinfo}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\def\mhp@mhpmisc{%
+  mhpmisc%
+}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\NeedsTeXFormat{LaTeX2e}[\mhp@TexFormatReleaseDate]
+
+
+\ProvidesPackage{\mhp@mhpmisc}[\mhp@ReleaseInfo]
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\RequirePackage{mhptools}
+
+
+\RequirePackage{mhpmain}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\newcommand*{\newaddressbookentry}[9]{%
+  \ifblank{#1}{%
+    \CommandWarning{\newaddressbookentry}{%
+      Ignoring request to define new address book entry with empty label%
+    }%
+  }{%
+    \expandafter\newcommand\expandafter*\csname#1\string\firstname     \endcsname{#2}%
+    \expandafter\newcommand\expandafter*\csname#1\string\shortfirstname\endcsname{#3}%
+    \expandafter\newcommand\expandafter*\csname#1\string\lastname      \endcsname{#4}%
+    \expandafter\newcommand\expandafter*\csname#1\string\postaladdress \endcsname{#5}%
+    \expandafter\newcommand\expandafter*\csname#1\string\phonenumber   \endcsname{#6}%
+    \expandafter\newcommand\expandafter*\csname#1\string\faxnumber     \endcsname{#7}%
+    \expandafter\newcommand\expandafter*\csname#1\string\emailaddress  \endcsname{#8}%
+    \expandafter\newcommand\expandafter*\csname#1\string\webaddress    \endcsname{#9}%
+    \expandafter\newcommand\expandafter*\csname#1\string\fullname      \endcsname{#2}%
+    \expandafter\newcommand\expandafter*\csname#1\string\shortfullname \endcsname{#3}%
+    \notblank{#4}{\expandafter\appto    \csname#1\string\fullname      \endcsname{ #4}}{}%
+    \notblank{#4}{\expandafter\appto    \csname#1\string\shortfullname \endcsname{\hardbreakspace#4}}{}%
+  }%
+}
+
+
+\newcommand*{\firstname}[1]{%
+  \mhp@addressbookitem{#1}{\string\firstname}%
+}
+
+
+\newcommand*{\shortfirstname}[1]{%
+  \mhp@addressbookitem{#1}{\string\shortfirstname}%
+}
+
+
+\newcommand*{\lastname}[1]{%
+  \mhp@addressbookitem{#1}{\string\lastname}%
+}
+
+
+\newcommand*{\postaladdress}[1]{%
+  \mhp@addressbookitem{#1}{\string\postaladdress}%
+}
+
+
+\newcommand*{\phonenumber}[1]{%
+  \mhp@addressbookitem{#1}{\string\phonenumber}%
+}
+
+
+\newcommand*{\faxnumber}[1]{%
+  \mhp@addressbookitem{#1}{\string\faxnumber}%
+}
+
+
+\newcommand*{\emailaddress}[1]{%
+  \mhp@addressbookitem{#1}{\string\emailaddress}%
+}
+
+
+\newcommand*{\webaddress}[1]{%
+  \mhp@addressbookitem{#1}{\string\webaddress}%
+}
+
+
+\newcommand*{\fullname}[1]{%
+  \mhp@addressbookitem{#1}{\string\fullname}%
+}
+
+
+\newcommand*{\shortfullname}[1]{%
+  \mhp@addressbookitem{#1}{\string\shortfullname}%
+}
+
+
+\def\mhp@addressbookitem#1#2{%
+  \protecting{%
+    \ifcsundef{#1#2}{%
+      \CommandWarning{\mhp@addressbookitem}{%
+        Address book entry `#1' is not defined%
+      }%
+    }{%
+      \csuse{#1#2}%
+    }%
+  }%
+}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\newcommand{\upperinfopage}[1]{%
+  \gdef\mhp@upperinfopage{#1}%
+}
+
+
+\newcommand{\lowerinfopage}[1]{%
+  \gdef\mhp@lowerinfopage{#1}%
+}
+
+
+\newcommand*{\makeinfopage}{%
+  \ifboolexpr{not (test{\ifdefvoid{\mhp@upperinfopage}} and test{\ifdefvoid{\mhp@lowerinfopage}})}{%
+    \clearpage
+    \begingroup
+    \noindent\csuse{mhp@upperinfopage}%
+    \endgroup
+    \par\vspace*{\stretch{1}}%
+    \begingroup
+    \noindent\csuse{mhp@lowerinfopage}%
+    \endgroup
+    \newpage
+  }{%
+  }%
+}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\newcommand{\lastpage}[1]{%
+  \gdef\mhp@lastpage{#1}%
+}
+
+
+\newcommand*{\makelastpage}{%
+  \cleardoubleevenemptypage
+  \thispagestyle{empty}%
+  \noindent\null\csuse{mhp@lastpage}%
+  \end{document}%
+}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\newcommand*{\newabbreviation}[2]{%
+  \newcommand*{#1}{\abbreviation{#2}}%
+}
+
+
+\newrobustcmd*{\abbreviation}[1]{%
+  #1\@%
+  \@ifnextchar\bgroup{\hardbreak}{%
+    \@ifnextchar\ {\hardbreak}{%
+      \@ifnextchar'{\kerning{.}{'}}{%
+        \@ifnextchar\csq@qclose{\kerning{\csq@bqgroup.}{\csq@qclose}}{%
+          \@ifnextchar.{\expandafter\mhp@terminal\expandafter.\ltx@gobble}{%
+          }%
+        }%
+      }%
+    }%
+  }%
+}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\ExplSyntaxOn
+
+
+\NewDocumentCommand{\entity}{}{}
+\DeclareExpandableDocumentCommand{\entity}{s m}{
+  \protecting{
+    \ifboolexpe{test{\IfBooleanTF{#1}} and test{\notblank{#2}}}{
+      %% NOTE: Since the argument might contain parameter characters it has to be passed to \textsf after detokenization.
+      \expandafter\textsf\expandafter{
+        \expandafter\nohyphens\expandafter{
+          \expandafter\mhp@entity\expandafter{
+            \detokenize{#2}
+          }
+        }
+      }
+    }{
+      \textsf{#2}
+    }
+  }
+}
+
+
+\def\mhp@entity{
+  \mhp@entity@fixpercent
+}
+
+
+\begingroup
+
+
+\catcode`\/=0
+\@makeother\\
+/catcode`/!=14
+/@makeother/%
+/catcode`/&=6
+/@makeother/#
+
+
+/gdef/mhp@entity@fixpercent&1{
+  /mhp@entity@expandafter/mhp@entity@fixpercent@/mhp@entity@fixhash@i{&1}\%/@nil
+}
+
+
+/gdef/mhp@entity@fixpercent@&1\%&2/@nil{
+  &1/ifstrempty{&2}{}{%/mhp@entity@fixpercent@&2/@nil}
+}
+
+
+/gdef/mhp@entity@fixhash@i&1{
+  /mhp@entity@expandafter/mhp@entity@fixhash@i@/mhp@entity@fixhash@ii{&1}\#/@nil
+}
+
+
+/gdef/mhp@entity@fixhash@i@&1\#&2/@nil{
+  &1/ifstrempty{&2}{}{#/mhp@entity@fixhash@i@&2/@nil}
+}
+
+
+/gdef/mhp@entity@fixhash@ii&1{
+  /mhp@entity@expandafter/mhp@entity@fixhash@ii@/ltx@zapspace{&1}/@empty##/@nil
+}
+
+
+/gdef/mhp@entity@fixhash@ii@&1##&2/@nil{
+  &1/ifstrempty{&2}{}{#/mhp@entity@fixhash@ii@&2/@nil}
+}
+
+
+/endgroup
+
+
+\def\mhp@entity@expandafter#1#2#3{
+  \expandafter#1
+  \romannumeral-`\1\expandafter\expandafter\expandafter\ltx@gobble\expandafter\string\csname#2{#3}\endcsname
+}
+
+
+\ExplSyntaxOff
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+%% NOTE: Macros with the \outer prefix cannot be passed to \latexcs directly. They have to be referred to by their names.
+\newcommand{\latexcs}[1]{%
+  \protecting{%
+    \ifboolexpe{not test{\ifstrempty{#1}}}{%
+      \expandafter\mhp@latexcs\expandafter{\string#1}%
+    }{%
+    }%
+  }%
+}
+
+
+\def\mhp@latexcs#1{%
+  \mhp@latexcs@{\expandafter\string\csname\if\ltx@backslashchar#1\else#1\fi\endcsname}%
+}
+
+
+\def\mhp@latexcs@#1{%
+  \begingroup
+  \expandarg
+  \edef\mhp@macro@a{#1}%
+  \StrSubstitute{\mhp@macro@a}{\string\ }{\ltx@backslashchar\textvisiblespace}[\mhp@macro@a]%
+  \StrSubstitute{\mhp@macro@a}{`}{\noexpand\textasciigrave}[\mhp@macro@a]%
+  \StrSubstitute{\mhp@macro@a}{'}{\noexpand\textquotesingle}[\mhp@macro@a]%
+  \StrSubstitute{\mhp@macro@a}{...}{\noexpand\textellipsis@orig\unkern}[\mhp@macro@a]%
+  \expandafter\endgroup
+  \expandafter\textsf\expandafter{%
+    \expandafter\nohyphens\expandafter{%
+      \expandafter\frenchspacing\mhp@macro@a
+    }%
+  }%
+}
+
+
+\begingroup
+
+
+\catcode`\/=0
+\@makeother\\
+
+
+/gdef/mhp@latexcs@@pdfstringdef#1{%
+  /expandafter/mhp@latexcs@@pdfstringdef@/romannumeral-`/1#1\/@nil
+}
+
+
+/gdef/mhp@latexcs@@pdfstringdef@#1\#2/@nil{%
+  #1/ifstrempty{#2}{}{/textbackslash/mhp@latexcs@@pdfstringdef@#2/@nil}%
+}
+
+
+/endgroup
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\newcommand*{\supplement}[1]{%
+  [#1]%
+}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\newcommand*{\placeholder}[1]{%
+  <#1>%
+}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\newcommand*{\phone}[5]{%
+  +#1\medspace#2\medspace#3\notblank{#4}{\medspace#4\notblank{#5}{\medspace#5}{}}{}%
+}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\newcommand*{\fax}{}
+\let\fax\phone
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\newcommand*{\version}[4]{%
+  #1%
+  \expandafter\notblank\expandafter{#2}{.#2\expandafter\notblank\expandafter{#3}{.#3}{}}{}%
+  \expandafter\notblank\expandafter{#4}{\mbox{\textendash}\hardbreak{}r#4}{}%
+}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\ExplSyntaxOn
+
+
+\NewDocumentCommand{\software}{s s m O{} m m m m}{
+  \mhp@software{#1}{#2}{#3}{#4}{#5}{#6}{#7}{#8}
+}
+
+
+\NewDocumentCommand{\software@pdfstringdef}{}{}
+\DeclareExpandableDocumentCommand{\software@pdfstringdef}{s s m O{} m m m m}{
+  \mhp@software{#1}{#2}{#3}{#4}{#5}{#6}{#7}{#8}
+}
+
+
+\def\mhp@software#1#2#3#4{
+  #3\IfBooleanTF{#1}{\hardbreakspace}{\thinspace}
+  #4\IfBooleanTF{#2}{\hardbreakspace}{}
+  \version
+}
+
+
+\ExplSyntaxOff
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\newcommand*{\Fortran}[1]{%
+  \ifblank{#1}{%
+    Fortran%
+  }{%
+    \ifnumgreater{#1}{77}{%
+      Fortran\hardbreakspace#1%
+    }{%
+      \acronymfont{FORTRAN\hardbreakspace#1}%
+    }%
+  }%
+}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+%% NOTE: We define \C as we please since its original definition is only available in PU encoding.
+\AfterEndPreamble{%
+  \providecommand*{\C}{}%
+  \renewcommand*{\C}[1]{%
+    C\@#1%
+  }%
+}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\newcolumntype{=}{%
+  >{\gdef\mhp@rowstyle{}}%
+}
+
+
+\newcolumntype{+}{%
+  >{\csuse{mhp@rowstyle}}%
+}
+
+
+\newcommand*{\rowstyle}[1]{%
+  \gdef\mhp@rowstyle{#1}%
+  \mhp@rowstyle\ignorespaces
+}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\newcolumntype{D}{%
+  >{\iftoggle{koma-class}{\usekomafont{descriptionlabel}}{\bfseries}}r<{:}X%
+}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\newrobustcmd*{\highlight}[1]{%
+  \colorbox{PaleGreen3}{#1}%
+}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\ExplSyntaxOn
+
+
+\NewDocumentCommand{\insi}{o m}{
+  \mhp@insi{#1}{#2}
+}
+
+
+\NewDocumentCommand{\insi@pdfstringdef}{}{}
+\DeclareExpandableDocumentCommand{\insi@pdfstringdef}{o m}{
+  \mhp@insi{#1}{#2}
+}
+
+
+\def\mhp@insi#1#2{
+  \csuse{mhp@insi-format}{
+    \IfNoValueTF{#1}{
+      \si{#2}
+    }{
+      \si[#1]{#2}
+    }
+  }
+}
+
+
+\csdef{mhp@insi-format}#1{
+  (in\hardbreakspace#1)
+}
+
+
+\ExplSyntaxOff
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\newcommand*{\shellcmd}{}
+\DeclareUrlCommand{\shellcmd}{%
+  \urlstyle{tt}%
+  \hyper@normalise
+}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\newcommand*{\nolinkemail}{}
+\DeclareUrlCommand{\nolinkemail}{%
+  \urlstyle{sf}%
+  \hyper@normalise
+}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\newcommand*{\email}{%
+  \hyper@normalise\mhp@email
+}
+
+
+\def\mhp@email#1{%
+  \href{mailto:#1}{\nolinkemail{#1}}%
+}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\newcommand*{\ctanurl}{%
+  \hyper@normalise\mhp@ctanurl
+}
+
+
+\def\mhp@ctanurl#1{%
+  \ifblank{#1}{%
+    \url{http://mirror.ctan.org}%
+  }{%
+    \href{http://mirror.ctan.org#1}{\nolinkurl{CTAN:#1}}%
+  }%
+}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\lstdefinestyle{default-file-listing}{
+  basicstyle=\small\normalfont\ttfamily,
+  basewidth=0.5em,
+  breaklines,
+  breakatwhitespace,
+  prebreak=\Pisymbol{psy}{191},
+  breakindent=1.0em,
+  caption=\lstname,
+  numbers=left,
+  numberstyle=\smaller,
+  stepnumber=5,
+  firstnumber=1,
+  aboveskip=\bigskipamount,
+  belowskip=\bigskipamount,
+  frame=single,
+}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\lstnewenvironment{command-line-listing}[1][]{%
+  \lstset{
+    basicstyle=\small\normalfont\ttfamily,
+    basewidth=0.5em,
+    xleftmargin=\leftmargini,
+    breaklines,
+    breakatwhitespace,
+    prebreak=\textbackslash,
+    breakindent=1.0em,
+    aboveskip=\smallskipamount,
+    belowskip=\smallskipamount,
+    print,
+    #1,
+  }%
+}{%
+}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\newcommand*{\tlabel}[1]{%
+  \hypertarget{#1}{\label{#1}}%
+}
+
+
+\newcommand*{\autotref}[1]{%
+  \hyperlink{#1}{\autoref*{#1}}%
+}
+
+
+\newcommand*{\autotpageref}[1]{%
+  \hyperlink{#1}{\autopageref*{#1}}%
+}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\newcommand*{\fullautoref}[1]{%
+  \csuse{mhp@fullautoref-format}{\autoref{#1}}{\autopageref{#1}}%
+}
+
+
+\newcommand*{\fullautotref}[1]{%
+  \csuse{mhp@fullautoref-format}{\autotref{#1}}{\autotpageref{#1}}%
+}
+
+
+\csdef{mhp@fullautoref-format}#1#2{%
+  #1\terminal, #2%
+}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\pdfstringdefDisableCommands{%
+  \let\abbreviation\ltx@firstofone
+  \let\mhp@latexcs@\mhp@latexcs@@pdfstringdef
+  \let\software\software@pdfstringdef
+  \let\insi\insi@pdfstringdef
+}
+
+
+%% NOTE: We override the definition of \highlight provided by the siunitx package.
+\patchcmd{\pdfstringdef}{%
+  \pdfstringdefPreHook
+}{%
+  \pdfstringdefPreHook
+  \let\highlight\ltx@firstofone
+}{
+}{
+  \PackageWarningFailedPatching{\mhp@mhpmisc}{\pdfstringdef}
+}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\endinput
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+%% LocalWords: mhpmisc siunitx latexcs textsf detokenization

@@ -1,0 +1,1927 @@
+%%---------------------------------------------------------------------------------------------------------------------------%%
+%%###########################################################################################################################%%
+%%---------------------------------------------------------------------------------------------------------------------------%%
+%%
+%%
+%% Abstract:
+%%   LaTeX package mhpmain sets up the mhpLaTeX document preparation framework.
+%%
+%% Details:
+%%   None.
+%%
+%% References:
+%% - LaTeX 2ε for class and package writers
+%%   --> http://mirror.ctan.org/macros/latex/doc/clsguide.pdf
+%% - The LaTeX 2ε Sources
+%%   --> http://mirror.ctan.org/macros/latex/doc/source2e.pdf
+%% - List of Internal LaTeX 2ε Macros Useful to Package Authors
+%%   --> http://mirror.ctan.org/info/macros2e/macros2e.pdf
+%% - TeX by Topic
+%%   --> http://mirror.ctan.org/info/texbytopic/TeXbyTopic.pdf
+%% - The pdfTeX user manual
+%%   --> http://mirror.ctan.org/systems/pdftex/pdftex-a.pdf
+%%
+%% TODO:
+%%   None.
+%%
+%% Author:
+%%   Michael H. Pock || MHP || mhp77@gmx.at
+%%
+%% © Copyleft 2012-2013 MHP
+%%
+%%
+%%---------------------------------------------------------------------------------------------------------------------------%%
+%%###########################################################################################################################%%
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\RequirePackage{mhpinfo}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\def\mhp@mhpmain{%
+  mhpmain%
+}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\NeedsTeXFormat{LaTeX2e}[\mhp@TexFormatReleaseDate]
+
+
+\ProvidesPackage{\mhp@mhpmain}[\mhp@ReleaseInfo]
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\RequirePackage{mhptools}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\newtoggle{koma-class}
+
+
+\ifdefmacro{\KOMAClassName}{
+  \toggletrue{koma-class}
+}{
+  \togglefalse{koma-class}
+}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\newtoggle{chapter-class}
+
+
+\ifdefmacro{\chapter}{
+  \toggletrue{chapter-class}
+}{
+  \togglefalse{chapter-class}
+}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\newtoggle{section-class}
+
+
+\ifdefmacro{\section}{
+  \toggletrue{section-class}
+}{
+  \togglefalse{section-class}
+}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\newtoggle{title-class}
+
+
+\AfterAtEndOfPackage{hyperref}{%
+  \ifdefmacro{\HyOrg@maketitle}{%
+    \toggletrue{title-class}%
+  }{%
+    \togglefalse{title-class}%
+  }%
+}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\def\mhp@SupportedLanguages{
+  naustrian,
+  ngerman,
+  UKenglish,
+  USenglish,
+  english,
+}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\def\mhp@MainLanguage{%
+  english%
+}
+
+
+\DeclareOption{english}{%
+  \let\mhp@MainLanguage\CurrentOption
+}
+
+
+\DeclareOption{USenglish}{%
+  \let\mhp@MainLanguage\CurrentOption
+}
+
+
+\DeclareOption{UKenglish}{%
+  \let\mhp@MainLanguage\CurrentOption
+}
+
+
+\DeclareOption{ngerman}{%
+  \let\mhp@MainLanguage\CurrentOption
+}
+
+
+\DeclareOption{naustrian}{%
+  \let\mhp@MainLanguage\CurrentOption
+}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\ProcessOptions*
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\DefineFamily{mhp}
+
+
+\DefineFamilyMember{mhp}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\csdef{mhp@glossaries}{}
+
+
+\csdef{mhp@glossaries/totoc}{}
+
+
+\DefineFamilyKey{mhp}{glossaries}{%
+  \IfStrEqCase*{#1}{
+    {nottotoc}       {\csdef{mhp@glossaries/totoc}{}}
+    {notoc}          {\csdef{mhp@glossaries/totoc}{}}
+    {totoc}          {\csdef{mhp@glossaries/totoc}{toc}}
+    {toc}            {\csdef{mhp@glossaries/totoc}{toc}}
+    {totocnumberline}{\csdef{mhp@glossaries/totoc}{toc, numberline}}
+    {tocnumberline}  {\csdef{mhp@glossaries/totoc}{toc, numberline}}
+  }[\csdef{mhp@glossaries}{#1}]%
+}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\FamilyProcessOptions{mhp}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\SetupKeyvalOptions{family=mhp, prefix=mhp@}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\DeclareStringOption{glossaries/acronymstyle}[]
+
+
+\DeclareStringOption{glossaries/processor}[]
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\DeclareStringOption{biblatex/style}[]
+
+
+\DeclareStringOption{biblatex/backend}[]
+
+
+\DeclareStringOption{biblatex/bibencoding}[]
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\ProcessKeyvalOptions*
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\def\do#1{%
+  \ifcsstring{#1}{default}{%
+    \csdef{#1}{}%
+  }{%
+  }%
+}
+
+
+\docsvlist{
+  mhp@glossaries/acronymstyle,
+  mhp@glossaries/processor,
+  mhp@biblatex/style,
+  mhp@biblatex/backend,
+  mhp@biblatex/bibencoding,
+}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\letcs{\mhp@macro@a}{mhp@glossaries/acronymstyle}
+
+
+\StrSubstitute{\mhp@macro@a}{+}{,}[\mhp@macro@a]
+
+
+\cslet{mhp@glossaries/acronymstyle}{\mhp@macro@a}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\nottoggle{koma-class}{
+  \RequirePackage{scrextend}[2012/07/29]
+  %% --> http://mirror.ctan.org/macros/latex/contrib/koma-script/doc/scrguien.pdf
+}{
+}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\RequirePackage{fixltx2e}[2006/09/13]
+%% --> http://texdoc.net/texmf-dist/doc/latex/base/fixltx2e.pdf
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\iftoggle{koma-class}{
+  \RequirePackage{scrhack}[2012/07/29]
+  %% --> http://mirror.ctan.org/macros/latex/contrib/koma-script/doc/scrguien.pdf
+}{
+}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\RequirePackage[automark, autooneside]{scrpage2}[2010/04/22]
+%% --> http://mirror.ctan.org/macros/latex/contrib/koma-script/doc/scrguien.pdf
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\RequirePackage{typearea}[2012/07/29]
+%% --> http://mirror.ctan.org/macros/latex/contrib/koma-script/doc/scrguien.pdf
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\RequirePackage{lmodern}[2009/10/30]
+%% --> http://mirror.ctan.org/fonts/ps-type1/lm/doc/fonts/lm/lm-info.pdf
+%% --> http://www.tug.org/TUGboat/Articles/tb24-1/jackowski.pdf
+%% --> http://www.tug.org/pracjourn/2006-1/robertson/robertson.pdf
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\RequirePackage[T1]{fontenc}[2005/09/27]
+%% --> http://mirror.ctan.org/macros/latex/doc/fntguide.pdf
+%% --> http://mirror.ctan.org/macros/latex/doc/encguide.pdf
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\RequirePackage{textcomp}[2005/09/27]
+%% --> http://mirror.ctan.org/macros/latex/doc/encguide.pdf
+%% --> http://mirror.ctan.org/info/symbols/comprehensive/symbols-a4.pdf
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\AfterAtEndOfPackage{hyperref}{%
+  %
+  %
+  \newcommand*{\textellipsis@orig}{}%
+  \let\textellipsis@orig\textellipsis
+  %
+  %
+  \RequirePackage{ellipsis}[2004/9/28]%
+  %% --> http://mirror.ctan.org/macros/latex/contrib/ellipsis/ellipsis.pdf
+}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\RequirePackage{pifont}[2005/04/12]
+%% --> http://mirror.ctan.org/macros/latex/required/psnfss/psnfss2e.pdf
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\RequirePackage{exscale}[2007/10/29]
+%% --> http://texdoc.net/texmf-dist/doc/latex/base/exscale.pdf
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\RequirePackage{amssymb}[2009/06/22]
+%% --> http://mirror.ctan.org/fonts/amsfonts/doc/amsfndoc.pdf
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+%% NOTE: The esint package disables the intlimits option of the amsmath package.
+\AfterAtEndOfPackage{mathtools}{%
+  \RequirePackage{esint}[]%
+  %% --> http://mirror.ctan.org/macros/latex/contrib/esint/esint.pdf
+}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\RequirePackage{dsfont}[1995/08/01]
+%% --> http://mirror.ctan.org/fonts/doublestroke/dsdoc.pdf
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\RequirePackage{relsize}[2011/09/21]
+%% --> http://mirror.ctan.org/macros/latex/contrib/relsize/relsize-doc.pdf
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\AfterAtEndOfPackage{mathtools}{%
+  \RequirePackage{bm}[2004/02/26]%
+  %% --> http://mirror.ctan.org/macros/latex/required/tools/bm.pdf
+}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\RequirePackage[utf8]{inputenx}[2011/05/27]
+%% --> http://mirror.ctan.org/macros/latex/contrib/oberdiek/inputenx.pdf
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\RequirePackage{newunicodechar}[2012/11/12]
+%% --> http://mirror.ctan.org/macros/latex/contrib/newunicodechar/newunicodechar.pdf
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\RequirePackage[\mhp@SupportedLanguages]{babel}[2008/07/08]
+%% --> http://mirror.ctan.org/info/babel/babel.pdf
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\RequirePackage[\mhp@SupportedLanguages]{translator}[2010/06/12]
+%% --> http://mirror.ctan.org/macros/latex/contrib/beamer/doc/beameruserguide.pdf
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\RequirePackage{hyphenat}[2009/09/02]
+%% --> http://mirror.ctan.org/macros/latex/contrib/hyphenat/hyphenat.pdf
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\RequirePackage[strict, autostyle]{csquotes}[2011/10/22]
+%% --> http://mirror.ctan.org/macros/latex/contrib/csquotes/csquotes.pdf
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\RequirePackage[user, abspage, lastpage, totpages]{zref}[2012/04/04]
+%% --> http://mirror.ctan.org/macros/latex/contrib/oberdiek/zref.pdf
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\RequirePackage[newcommands]{ragged2e}[2009/05/21]
+%% --> http://mirror.ctan.org/macros/latex/contrib/ms/ragged2e.pdf
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\RequirePackage{varwidth}[2009/03/30]
+%% --> http://mirror.ctan.org/macros/latex/contrib/varwidth/varwidth-doc.pdf
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\RequirePackage{comment}[]
+%% --> http://mirror.ctan.org/macros/latex/contrib/comment/comment.pdf
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\RequirePackage{array}[2008/09/09]
+%% --> http://mirror.ctan.org/macros/latex/required/tools/array.pdf
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+%% NOTE: Loading the tabularx package after the hyperref package makes footnote marks inside tabularx tables into hyperlinks to
+%% the respective footnote texts, provided that we use \footnotemark and \footnotetext instead of \footnote.
+\AfterAtEndOfPackage{hyperref}{%
+  \RequirePackage{tabularx}[1999/01/07]%
+  %% --> http://mirror.ctan.org/macros/latex/required/tools/tabularx.pdf
+}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\RequirePackage{longtable}[2004/02/01]
+%% --> http://mirror.ctan.org/macros/latex/required/tools/longtable.pdf
+
+
+\RequirePackage{ltabptch}[2005/01/10]
+%% --> http://mirror.ctan.org/macros/latex/contrib/ltabptch/ltabptch.pdf
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\RequirePackage{supertabular}[2004/02/20]
+%% --> http://mirror.ctan.org/macros/latex/contrib/supertabular/supertabular.pdf
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\RequirePackage{booktabs}[2005/04/14]
+%% --> http://mirror.ctan.org/macros/latex/contrib/booktabs/booktabs.pdf
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\RequirePackage{amsmath}[2000/07/18]
+%% --> http://mirror.ctan.org/macros/latex/required/amslatex/math/amsldoc.pdf
+%% --> http://mirror.ctan.org/info/math/voss/mathmode/Mathmode.pdf
+
+
+\RequirePackage{mathtools}[2012/04/24]
+%% --> http://mirror.ctan.org/macros/latex/contrib/mh/mathtools.pdf
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\RequirePackage[retainorgcmds]{IEEEtrantools}[2007/01/11]
+%% --> http://mirror.ctan.org/macros/latex/contrib/IEEEtran/tools/IEEEtrantools_doc.txt
+%% --> http://mirror.ctan.org/macros/latex/contrib/IEEEtran/IEEEtran_HOWTO.pdf
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\RequirePackage{cases}[2002/05/02]
+%% --> http://mirror.ctan.org/macros/latex/contrib/cases/cases.pdf
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\RequirePackage[rgb, svgnames, x11names, table]{xcolor}[2007/01/21]
+%% --> http://mirror.ctan.org/macros/latex/contrib/xcolor/xcolor.pdf
+%% --> http://mirror.ctan.org/macros/latex/contrib/colortbl/colortbl.pdf
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\RequirePackage{graphicx}[1999/02/16]
+%% --> http://mirror.ctan.org/macros/latex/required/graphics/grfguide.pdf
+%% --> http://mirror.ctan.org/info/epslatex/english/epslatex.pdf
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\PassOptionsToPackage{version=latest}{pgf}
+
+
+\RequirePackage{tikz}[2010/10/13]
+%% --> http://mirror.ctan.org/graphics/pgf/base/doc/generic/pgf/pgfmanual.pdf
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\RequirePackage[framemethod=tikz]{mdframed}[2012/09/21]
+%% --> http://mirror.ctan.org/macros/latex/contrib/mdframed/mdframed.pdf
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\RequirePackage{pdflscape}[2008/08/11]
+%% --> http://mirror.ctan.org/macros/latex/contrib/oberdiek/pdflscape.pdf
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\RequirePackage{dtklogos}[2012/05/02]
+%% --> http://mirror.ctan.org/macros/latex/contrib/dtk/dtklogos.sty
+%% --> http://mirror.ctan.org/macros/latex/contrib/metalogo/metalogo.pdf
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\RequirePackage{kantlipsum}[2012/10/14]
+%% --> http://mirror.ctan.org/macros/latex/contrib/kantlipsum/kantlipsum.pdf
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\RequirePackage[level, nodayofweek]{datetime}[2010/09/21]
+%% --> http://mirror.ctan.org/macros/latex/contrib/datetime/datetime.pdf
+%% --> http://mirror.ctan.org/macros/latex/contrib/fmtcount/fmtcount.pdf
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\RequirePackage{xfrac}[2012/11/09]
+%% --> http://mirror.ctan.org/macros/latex/contrib/l3packages/xfrac.pdf
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\RequirePackage{siunitx}[2012/11/27]
+%% --> http://mirror.ctan.org/macros/latex/contrib/siunitx/siunitx.pdf
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\RequirePackage[version=3]{mhchem}[2011/06/03]
+%% --> http://mirror.ctan.org/macros/latex/contrib/mhchem/mhchem.pdf
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\RequirePackage[hyphens, obeyspaces, spaces]{url}[2006/04/12]
+%% --> http://mirror.ctan.org/macros/latex/contrib/url/url.pdf
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\RequirePackage{fancyvrb}[2008/02/07]
+%% --> http://mirror.ctan.org/macros/latex/contrib/fancyvrb/fancyvrb.pdf
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\RequirePackage[savemem]{listings}[2007/02/22]
+%% --> http://mirror.ctan.org/macros/latex/contrib/listings/listings.pdf
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\ifdraft{
+  \PassOptionsToPackage{marginpar}{todo}
+}{
+  \PassOptionsToPackage{hide}{todo}
+}
+
+
+\RequirePackage{todo}[2010/03/31]
+%% --> http://mirror.ctan.org/macros/latex/contrib/todo/todo.pdf
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\RequirePackage{makeidx}[2000/03/29]
+%% --> http://mirror.ctan.org/indexing/makeindex/doc/makeindex.pdf
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\ifboolexpr{not test{\ifcsvoid{mhp@glossaries}}}{
+  \PassOptionsToPackage{\csuse{mhp@glossaries}}{glossaries}
+}{
+}
+
+
+\ifboolexpr{not test{\ifcsvoid{mhp@glossaries/totoc}}}{
+  \PassOptionsToPackage{\csuse{mhp@glossaries/totoc}}{glossaries}
+}{
+}
+
+
+\ifboolexpr{not test{\ifcsvoid{mhp@glossaries/acronymstyle}}}{
+  \PassOptionsToPackage{\csuse{mhp@glossaries/acronymstyle}}{glossaries}
+}{
+}
+
+
+\ifboolexpr{not test{\ifcsvoid{mhp@glossaries/processor}}}{
+  \PassOptionsToPackage{\csuse{mhp@glossaries/processor}}{glossaries}
+}{
+}
+
+
+\AfterAtEndOfPackage{hyperref}{%
+  \RequirePackage[
+    sanitize=none,
+    savewrites,
+    style=listgroup,
+    acronym,
+    shortcuts,
+  ]{glossaries}[2012/11/18]%
+  %% --> http://mirror.ctan.org/macros/latex/contrib/glossaries/glossariesbegin.pdf
+  %% --> http://mirror.ctan.org/macros/latex/contrib/glossaries/glossaries-user.pdf
+}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\ifboolexpr{not test{\ifcsvoid{mhp@biblatex/style}}}{
+  \PassOptionsToPackage{style=\csuse{mhp@biblatex/style}}{biblatex}
+}{
+}
+
+
+\ifboolexpr{not test{\ifcsvoid{mhp@biblatex/backend}}}{
+  \PassOptionsToPackage{backend=\csuse{mhp@biblatex/backend}}{biblatex}
+}{
+}
+
+
+\ifboolexpr{not test{\ifcsvoid{mhp@biblatex/bibencoding}}}{
+  \PassOptionsToPackage{bibencoding=\csuse{mhp@biblatex/bibencoding}}{biblatex}
+}{
+}
+
+
+\RequirePackage{biblatex}[2012/08/17]
+%% --> http://mirror.ctan.org/macros/latex/contrib/biblatex/doc/biblatex.pdf
+%% --> http://mirror.ctan.org/biblio/bibtex/contrib/doc/btxdoc.pdf
+%% --> http://mirror.ctan.org/biblio/biber/biber.pdf
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+%% NOTE: We filter out pseudo-warning messages issued by the hyperref package via \Hy@Message.
+\WarningsOff[NoPackage]
+
+
+\ifscreen{
+  \PassOptionsToPackage{final}{hyperref}
+}{
+  \PassOptionsToPackage{draft}{hyperref}
+}
+
+
+%% NOTE: After setting the pdfencoding option to ‘auto’ or ‘unicode’, we may assume that a future change of its value will not
+%% affect the definition of text symbols such as \textendash anymore.
+\PassOptionsToPackage{pdfencoding=unicode}{hyperref}
+
+
+\RequirePackage{hyperref}[2012/09/27]
+%% --> http://mirror.ctan.org/macros/latex/contrib/hyperref/doc/manual.pdf
+%% --> http://mirror.ctan.org/macros/latex/contrib/hyperref/doc/paper.pdf
+%% --> http://mirror.ctan.org/macros/latex/contrib/hyperref/README.pdf
+
+
+\WarningsOn[NoPackage]
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\ifscreen{
+  \PassOptionsToPackage{final}{bookmark}
+}{
+  \PassOptionsToPackage{draft}{bookmark}
+}
+
+
+\RequirePackage{bookmark}[2011/12/02]
+%% --> http://mirror.ctan.org/macros/latex/contrib/oberdiek/bookmark.pdf
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\newcounter{hardbreakpenalty}
+
+
+\defcounter{hardbreakpenalty}{%
+  \binoppenalty
+}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\newcommand*{\hardbreak}{%
+  \penalty\value{hardbreakpenalty}%
+}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\newrobustcmd*{\hardbreakspace}{%
+  \leavevmode\hardbreak\ %
+}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\newrobustcmd*{\hbhyphen}{%
+  \nobreak\mbox{-}\hardbreak\hskip\z@skip
+}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\apptocmd{\textendash}{%
+  \penalty\exhyphenpenalty\hskip\z@skip
+}{
+}{
+  \PackageWarningFailedPatching{\mhp@mhpmain}{\textendash}
+}
+
+
+\robustify\textendash
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\apptocmd{\textemdash}{%
+  \nobreak\hskip\z@skip
+}{
+}{
+  \PackageWarningFailedPatching{\mhp@mhpmain}{\textemdash}
+}
+
+
+\robustify\textemdash
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\apptocmd{\textfractionsolidus}{%
+  \penalty\exhyphenpenalty\hskip\z@skip
+}{
+}{
+  \PackageWarningFailedPatching{\mhp@mhpmain}{\textfractionsolidus}
+}
+
+
+\robustify\textfractionsolidus
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\newrobustcmd*{\kerning}[2]{%
+  \setlength{\mhp@length@a}{\widthof{#1#2} - \widthof{#1\null#2}}%
+  \kern\mhp@length@a
+}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\newcommand*{\preservekerning}[3]{%
+  #1\kerning{#1}{#3}#2#3%
+}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+%% NOTE: When \terminal appears immediately after a text font command and has an element of \nocorrlist as argument the italic
+%% correction is no longer automatically suppressed, but needs to be explicitly suppressed using \nocorr.
+\newcommand*{\terminal}[1]{%
+  #1\protecting{\mhp@terminal{#1}}%
+}
+
+
+\def\mhp@terminal#1{%
+  \spacefactor=\sfcode`#1%
+  \mhp@terminal@ifnextchar'{\kerning{#1}{'}}{%
+    \mhp@terminal@ifnextchar\csq@qclose{\kerning{\csq@bqgroup#1}{\csq@qclose}}{%
+    }%
+  }%
+}
+
+
+\let\mhp@terminal@ifnextchar\@ifnextchar
+
+
+\patchcmd{\mhp@terminal@ifnextchar}{%
+  \@ifnch
+}{%
+  \mhp@terminal@ifnch
+}{
+}{
+  \PackageWarningFailedPatching{\mhp@mhpmain}{\mhp@terminal@ifnextchar}
+}
+
+
+\let\mhp@terminal@ifnch\@ifnch
+
+
+\patchcmd{\mhp@terminal@ifnch}{%
+  \let\reserved@c\@xifnch
+}{%
+  \let\reserved@c\reserved@b
+}{
+}{
+  \PackageWarningFailedPatching{\mhp@mhpmain}{\mhp@terminal@ifnch}
+}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\ExplSyntaxOn
+
+
+\NewDocumentCommand{\newline@pdfstringdef}{}{}
+\DeclareExpandableDocumentCommand{\newline@pdfstringdef}{o m}{
+  {~}#2
+}
+
+
+\ExplSyntaxOff
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+%% NOTE: The inner \ifundef chain is solely needed for proper balancing in case of \if@titlepage being undefined.
+\ifundef{\if@titlepage}\iffalse\iftrue\ifundef{\if@titlepage}\iffalse
+  \if@titlepage
+    \patchcmd{\title}{%
+      #1%
+    }{%
+      #1%
+      \thispagestyle{\titlepagestyle}%
+    }{
+    }{
+      \PackageWarningFailedPatching{\mhp@mhpmain}{\title}
+    }
+    \renewcommand*{\titlepagestyle}{%
+      empty%
+    }
+  \else
+    \ifdefmacro{\scr@ext@activate@title}{
+      \apptocmd{\HyOrg@maketitle}{%
+        \thispagestyle{\titlepagestyle}%
+      }{
+      }{
+        \PackageWarningFailedPatching{\mhp@mhpmain}{\HyOrg@maketitle}
+      }
+    }{
+    }
+  \fi
+\fi
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\ifdefparam{\extratitle}\iftrue\iffalse
+  \patchcmd{\extratitle}{%
+    #1%
+  }{%
+    #1%
+    \thispagestyle{\extratitlepagestyle}%
+  }{
+  }{
+    \PackageWarningFailedPatching{\mhp@mhpmain}{\extratitle}
+  }
+  \newcommand*{\extratitlepagestyle}{%
+    \titlepagestyle
+  }
+\fi
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\xpatchcmd{\labeling}{%
+  #2%
+}{%
+  #2%
+  \IfStrEq{#1}{}{}{\hspace{\labelsep}}%
+}{
+}{
+  \PackageWarningFailedPatching{\mhp@mhpmain}{\labeling}
+}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\newcommand*{\DeclareMainPageStyleSetUp}[2]{%
+  \csdef{mhp@MainPageStyleSetUp@#1}{#2}%
+}
+
+
+\@onlypreamble\DeclareMainPageStyleSetUp
+
+
+\newcommand*{\MainPageStyle}[1]{%
+  \csuse{mhp@MainPageStyleSetUp@#1}%
+  \AfterEndPreamble{%
+    \pagestyle{#1}%
+  }%
+  \gdef\MainPageStyle##1{%
+    \CommandWarning{\MainPageStyle}{%
+      Main page style already selected. Ignoring request to change main page style%
+    }%
+  }%
+}
+
+
+\@onlypreamble\MainPageStyle
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\DeclareMainPageStyleSetUp{empty}{%
+  \KOMAoptions{headinclude=off, footinclude=off}%
+  \recalctypearea
+  \AfterEndPreamble{%
+    \ifscreen{%
+      \renewcommand*{\headcolor}{\color{Blue3}}%
+    }{%
+      \renewcommand*{\headcolor}{}%
+    }%
+    \iftoggle{koma-class}{%
+      \renewcommand*{\headfont}{\headcolor\sffamily}%
+    }{%
+      \renewcommand*{\headfont}{\headcolor}%
+    }%
+    \renewcommand*{\footfont}{}%
+    \renewcommand*{\pnumfont}{}%
+    \setheadwidth[0pt]{text}%
+    \setfootwidth[0pt]{head}%
+    \setheadtopline[head]{0pt}[\headcolor]%
+    \setheadsepline[head]{0pt}[\headcolor]%
+    \setfootsepline[foot]{0pt}[\headcolor]%
+    \setfootbotline[foot]{0pt}[\headcolor]%
+    \let\ps@plain\ps@empty
+    \let\ps@headings\ps@empty
+    \let\ps@myheadings\ps@empty
+    \let\ps@useheadings\ps@empty
+    \let\ps@@scrplain\ps@empty
+    \let\ps@@scrheadings\ps@empty
+  }%
+}
+
+
+\DeclareMainPageStyleSetUp{scrplain}{%
+  \KOMAoptions{headinclude=off, footinclude=off}%
+  \recalctypearea
+  \AfterEndPreamble{%
+    \ifscreen{%
+      \renewcommand*{\headcolor}{\color{Blue3}}%
+    }{%
+      \renewcommand*{\headcolor}{}%
+    }%
+    \iftoggle{koma-class}{%
+      \renewcommand*{\headfont}{\headcolor\sffamily}%
+    }{%
+      \renewcommand*{\headfont}{\headcolor}%
+    }%
+    \renewcommand*{\footfont}{}%
+    \renewcommand*{\pnumfont}{}%
+    \setheadwidth[0pt]{text}%
+    \setfootwidth[0pt]{head}%
+    \setheadtopline[head]{0pt}[\headcolor]%
+    \setheadsepline[head]{0pt}[\headcolor]%
+    \setfootsepline[foot]{0pt}[\headcolor]%
+    \setfootbotline[foot]{0pt}[\headcolor]%
+  }%
+}
+
+
+\DeclareMainPageStyleSetUp{scrheadings}{%
+  \KOMAoptions{headinclude=on, footinclude=off}%
+  \recalctypearea
+  \AfterEndPreamble{%
+    \ifscreen{%
+      \renewcommand*{\headcolor}{\color{Blue3}}%
+    }{%
+      \renewcommand*{\headcolor}{}%
+    }%
+    \iftoggle{koma-class}{%
+      \renewcommand*{\headfont}{\headcolor\sffamily\slshape}%
+    }{%
+      \renewcommand*{\headfont}{\headcolor\slshape}%
+    }%
+    \renewcommand*{\footfont}{\upshape}%
+    \renewcommand*{\pnumfont}{\upshape}%
+    \setheadwidth[0pt]{text}%
+    \setfootwidth[0pt]{head}%
+    \setheadtopline[head]{0pt}[\headcolor]%
+    \setheadsepline[head]{0.4pt}[\headcolor]%
+    \setfootsepline[foot]{0pt}[\headcolor]%
+    \setfootbotline[foot]{0pt}[\headcolor]%
+  }%
+}
+
+
+\newcommand*{\headcolor}{}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\IfStrEq*{\Gin@driver}{dvipdfmx.def}{
+  \KOMAoptions{pagesize=dvipdfmx}
+}{
+  \KOMAoptions{pagesize=auto}
+}
+
+
+\recalctypearea
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\robustify\textellipsis
+
+
+\xpatchcmd{\ldots}{%
+  \textellipsis
+}{%
+  \textellipsis@orig
+}{
+}{
+  \PackageWarningFailedPatching{\mhp@mhpmain}{\ldots}
+}
+
+
+\AfterEndPreamble{%
+  \xpatchcmd{\dots}{%
+    \mathellipsis
+  }{%
+    \expandafter\mdots@
+  }{%
+  }{%
+    \PackageWarningFailedPatching{\mhp@mhpmain}{\dots}%
+  }%
+}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\let\idotsint\dotsint
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\renewcommand*{\RSsmallest}{%
+  4.0pt%
+}
+
+
+\renewcommand*{\RSlargest}{%
+  30.0pt%
+}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\DeclareUnicodeCharacter{2010}{\hyphen}
+
+
+\DeclareUnicodeCharacter{2011}{\nbhyphen}
+
+
+\DeclareUnicodeCharacter{2212}{\textminus}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\expandafter\main@language\expandafter{\mhp@MainLanguage}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\newcommand*{\Hyphenation}[2][]{%
+  \ifblank{#1}{%
+    \AfterEndPreamble{%
+      \hyphenation{#2}%
+    }%
+  }{%
+    \DefineHyphenationExceptions{#1}{#2}%
+  }%
+}
+
+
+\@onlypreamble\Hyphenation
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\pretocmd{\select@language}{%
+  \edef\languagename{#1}%
+}{
+}{
+  \PackageWarningFailedPatching{\mhp@mhpmain}{\select@language}
+}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\xpatchcmd{\iftranslationdefined}{%
+  \ifx\csname tr@@@\trans@to @#2\endcsname\@undefined
+    \let\trans@next=\@firstoftwo
+  \else
+    \let\trans@next=\@secondoftwo
+  \fi
+}{%
+  \ifx\csname tr@@@\trans@to @#2\endcsname\relax
+    \let\trans@next=\@secondoftwo
+  \else
+    \let\trans@next=\@firstoftwo
+  \fi
+}{
+}{
+  \PackageWarningFailedPatching{\mhp@mhpmain}{\iftranslationdefined}
+}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\DeclarePlainStyle{\textquotedblleft}{\textquotedblright}{\textquoteleft}{\textquoteright}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\notbool{@raggedtwoe@originalparameters}{
+  \apptocmd{\Centering}{%
+    \hbadness=\@M
+  }{
+  }{
+    \PackageWarningFailedPatching{\mhp@mhpmain}{\Centering}
+  }
+  \apptocmd{\RaggedRight}{%
+    \hbadness=\@M
+  }{
+  }{
+    \PackageWarningFailedPatching{\mhp@mhpmain}{\RaggedRight}
+  }
+  \apptocmd{\RaggedLeft}{%
+    \hbadness=\@M
+  }{
+  }{
+    \PackageWarningFailedPatching{\mhp@mhpmain}{\RaggedLeft}
+  }
+  \notbool{@raggedtwoe@originalcommands}{
+    \let\centering\Centering
+    \let\raggedright\RaggedRight
+    \let\raggedleft\RaggedLeft
+  }{
+  }
+}{
+}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\notbool{@raggedtwoe@originalcommands}{
+  \patchcmd{\LaTeXcenter}{%
+    \centering
+  }{%
+    \LaTeXcentering
+  }{
+  }{
+    \PackageWarningFailedPatching{\mhp@mhpmain}{\LaTeXcenter}
+  }
+  \patchcmd{\LaTeXflushleft}{%
+    \raggedright
+  }{%
+    \LaTeXraggedright
+  }{
+  }{
+    \PackageWarningFailedPatching{\mhp@mhpmain}{\LaTeXflushleft}
+  }
+  \patchcmd{\LaTeXflushright}{%
+    \raggedleft
+  }{%
+    \LaTeXraggedleft
+  }{
+  }{
+    \PackageWarningFailedPatching{\mhp@mhpmain}{\LaTeXflushright}
+  }
+}{
+}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\renewcommand*{\CommentCutFile}{%
+  \jobname.cut%
+}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\allowdisplaybreaks[1]
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\ifbool{@fleqn}{
+  \BeforeBeginEnvironment{equation}{%
+    \ifbool{hmode}{\unskip}{}%
+  }
+}{
+}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\mathtoolsset{mathic}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\renewenvironment*{eqnarray}{%
+  \IEEEeqnarray{rCl}%
+}{%
+  \endIEEEeqnarray
+}
+
+
+\renewenvironment*{eqnarray*}{%
+  \csuse{IEEEeqnarray*}{rCl}%
+}{%
+  \csuse{endIEEEeqnarray*}%
+}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+%% NOTE: Certainly, glossary terms based on \TeX and friends will appear in PDF strings ...
+\robustify\TeX
+\robustify\LaTeX
+\robustify\LaTeXe
+\robustify\BibTeX
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\newcommand*{\@ordinalMnaustrian}{}
+\let\@ordinalMnaustrian\@ordinalMngerman
+
+
+\newcommand*{\@ordinalFnaustrian}{}
+\let\@ordinalFnaustrian\@ordinalFngerman
+
+
+\newcommand*{\@ordinalNnaustrian}{}
+\let\@ordinalNnaustrian\@ordinalNngerman
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\UseCollection{xfrac}{plainmath}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\sisetup{
+  binary-units,
+  detect-all,
+  detect-inline-family=math,
+  detect-inline-weight=math,
+  detect-display-math,
+  separate-uncertainty,
+  allow-number-unit-breaks,
+}
+
+
+\addto{\extrasenglish}{%
+  \sisetup{locale=US}%
+}
+
+
+\addto{\extrasUSenglish}{%
+  \sisetup{locale=US}%
+}
+
+
+\addto{\extrasUKenglish}{%
+  \sisetup{locale=UK}%
+}
+
+
+\addto{\extrasngerman}{%
+  \sisetup{locale=DE}%
+}
+
+
+\addto{\extrasnaustrian}{%
+  \sisetup{locale=DE}%
+}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\mhchemoptions{textminus=\textminus, arrows=pgf-filled}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\patchcmd{\path}{%
+  \urlstyle{tt}%
+}{%
+  \urlstyle{tt}%
+  \hyper@normalise
+}{
+}{
+  \PackageWarningFailedPatching{\mhp@mhpmain}{\path}
+}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\lstloadlanguages{
+  bash,
+  [ANSI]C,
+  [ISO]C++,
+  [95]Fortran,
+  [gnu]make,
+  Octave,
+  Perl,
+  Python,
+  [LaTeX]TeX,
+}
+
+
+\lstset{basicstyle=\ttfamily, basewidth=0.5em, upquote, escapeinside=}
+
+
+\newcaptionname{ngerman}  {\lstlistingname}{Listing}
+\newcaptionname{naustrian}{\lstlistingname}{Listing}
+
+
+\newcaptionname{ngerman}  {\lstlistlistingname}{Listings}
+\newcaptionname{naustrian}{\lstlistlistingname}{Listings}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\renewcommand*{\todomark}{%
+  TODO%
+}
+
+
+\renewcommand*{\todoformat}{%
+  \color{Red3}%
+}
+
+
+\ifdefequal{\@tododisplay}{\marginpar}{
+  \let\@tododisplay\marginline
+}{
+}
+
+
+\renewcommand*{\todoname}{%
+  \translate{TODOs}%
+}
+
+
+\newtranslation[to=English]{TODOs}{TODOs}
+\newtranslation[to=German] {TODOs}{TODOs}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\xpatchcmd{\@displayfulltodo}{%
+  {\todoformat#1} #2 %
+}{%
+  {\todoformat#1} #2\ %
+}{
+}{
+  \PackageWarningFailedPatching{\mhp@mhpmain}{\@displayfulltodo}
+}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\patchcmd{\todos}{%
+  \section*{\todoname}%
+  \large
+}{%
+  \section*{\todoname}%
+  \@mkboth{}{}%
+}{
+}{
+  \PackageWarningFailedPatching{\mhp@mhpmain}{\todos}
+}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\ifboolexpr{test{\ifglossaryexists{main}} and (not test{\glsIfListOfAcronyms{main}})}{
+  \defglsdisplayfirst[main]{%
+    \emph{#1}#4%
+  }
+}{
+}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\newrobustcmd*{\noacronymfont}[1]{%
+  \begingroup
+  \let\acronymfont\ltx@firstofone
+  #1%
+  \endgroup
+}
+
+
+%% NOTE: We make \acronymfont robust as we want \noacronymfont to work reliably.
+\robustify\acronymfont
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\newcommand*{\acrentryshort}{}
+\let\acrentryshort\glsentryshort
+
+
+\newcommand*{\acrentryshortpl}{}
+\let\acrentryshortpl\glsentryshortpl
+
+
+\newcommand*{\acrentrylong}{}
+\let\acrentrylong\glsentrylong
+
+
+\newcommand*{\acrentrylongpl}{}
+\let\acrentrylongpl\glsentrylongpl
+
+
+\newcommand*{\acrentryfull}{}
+\let\acrentryfull\glsentryfull
+
+
+\newcommand*{\acrentryfullpl}{}
+\let\acrentryfullpl\glsentryfullpl
+
+
+\ifbool{glsacrshortcuts}{
+  \newcommand*{\aces}{}
+  \let\aces\acrentryshort
+  \newcommand*{\acesp}{}
+  \let\acesp\acrentryshortpl
+  \newcommand*{\acel}{}
+  \let\acel\acrentrylong
+  \newcommand*{\acelp}{}
+  \let\acelp\acrentrylongpl
+  \newcommand*{\acef}{}
+  \let\acef\acrentryfull
+  \newcommand*{\acefp}{}
+  \let\acefp\acrentryfullpl
+}{
+}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\newcommand{\newnotationentry}[2]{%
+  \newglossaryentry{#1}{type=\notationtype, #2}%
+}
+
+
+\newcommand*{\notationtype}{%
+  \glsdefaulttype
+}
+
+
+\ifbool{glsacronym}{
+  \newglossary[nlg]{notation}{not}{noa}{\notationname}
+  \renewcommand*{\notationtype}{%
+    notation%
+  }
+}{
+}
+
+
+\newcommand*{\notationname}{%
+  Notation%
+}
+
+
+%% NOTE: We do not provide for the case that the translator package has not been loaded.
+\ifglstranslate
+  \renewcommand*{\notationname}{%
+    \translate{Notation}%
+  }
+  \patchcmd{\glssettoctitle}{%
+    {%
+      \def\glossarytoctitle{\csname @glotype@#1@title\endcsname}%
+    }%
+  }{%
+    {%
+      \IfStrEq*{#1}{notation}{%
+        \translatelet{\glossarytoctitle}{Notation}%
+      }{%
+        \def\glossarytoctitle{\csname @glotype@#1@title\endcsname}%
+      }%
+    }%
+  }{
+  }{
+    \PackageWarningFailedPatching{\mhp@mhpmain}{\glssettoctitle}
+  }
+  \newtranslation[to=English]{Notation}{Notation}
+  \newtranslation[to=German] {Notation}{Notation}
+\fi
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\newcommand{\setglossarypreamble}[2][\glsdefaulttype]{%
+  \ifglossaryexists{#1}{%
+    \csgdef{mhp@glossarypreamble@#1}{#2}%
+  }{%
+    \CommandWarning{\setglossarypreamble}{%
+      Glossary `#1' is not defined%
+    }%
+  }%
+}
+
+
+\renewcommand*{\glossarypreamble}{%
+  \csuse{mhp@glossarypreamble@\currentglossary}%
+}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\robustify\nopostdesc
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\patchcmd{\glspostdescription}{%
+  .%
+}{%
+  \terminal.%
+}{
+}{
+  \PackageWarningFailedPatching{\mhp@mhpmain}{\glspostdescription}
+}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\xpatchcmd{\printglossary}{%
+  \findrootlanguage
+}{%
+  \findrootlanguage
+  \IfSubStr*{\rootlanguagename}{german}{%
+    \def\rootlanguagename{german-duden}%
+  }{%
+  }%
+}{
+}{
+  \PackageWarningFailedPatching{\mhp@mhpmain}{\printglossary}
+}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\patchcmd{\gls@doclearpage}{%
+  \ifcsundef{cleardoublepage}{\clearpage}{\cleardoublepage}%
+}{%
+  \ifbool{@openright}{\cleardoublepage}{\clearpage}%
+}{
+}{
+  \PackageWarningFailedPatching{\mhp@mhpmain}{\gls@doclearpage}
+}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\ExecuteBibliographyOptions{sortcites, babel=hyphen, backref}
+
+
+\ifboolexpr{test{\IfLanguageName{english}} or test{\IfLanguageName{USenglish}}}{
+  \ExecuteBibliographyOptions{sortlocale=en-US}
+}{
+  \IfLanguageName{UKenglish}{
+    \ExecuteBibliographyOptions{sortlocale=en-GB}
+  }{
+    \IfLanguageName{ngerman}{
+      \ExecuteBibliographyOptions{sortlocale=de-DE}
+    }{
+      \IfLanguageName{naustrian}{
+        \ExecuteBibliographyOptions{sortlocale=de-AT}
+      }{
+      }
+    }
+  }
+}
+
+
+\AfterEndPreamble{%
+  \deflength{\biblabelsep}{%
+    \labelsep
+  }%
+}
+
+
+\AfterEndPreamble{%
+  \defcounter{abbrvpenalty}{%
+    \value{hardbreakpenalty}%
+  }%
+  \defcounter{highnamepenalty}{%
+    \value{hardbreakpenalty}%
+  }%
+  \defcounter{lownamepenalty}{%
+    \value{hardbreakpenalty} / 2%
+  }%
+}
+
+
+\renewcommand*{\mkbibacro}[1]{%
+  #1%
+}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\patchcmd{\bibsetup}{%
+  \raggedbottom
+}{%
+}{
+}{
+  \PackageWarningFailedPatching{\mhp@mhpmain}{\bibsetup}
+}
+
+
+\AfterEndPreamble{%
+  \deflength{\bibitemsep}{%
+    1\bibitemsep plus \gluestretch\itemsep minus \glueshrink\bibitemsep
+  }%
+}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\hypersetup{
+  linktoc=all,
+  colorlinks,
+  linkcolor=,
+  citecolor=,
+  urlcolor=Blue3,
+  filecolor=Blue3,
+}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\iftoggle{title-class}{
+  \pretocmd{\HyOrg@maketitle}{%
+    \hypersetup{pdftitle=\@title, pdfauthor=\@author}%
+  }{
+  }{
+    \PackageWarningFailedPatching{\mhp@mhpmain}{\HyOrg@maketitle}
+  }
+  \ifdefparam{\subject}{
+    \pretocmd{\HyOrg@maketitle}{%
+      \hypersetup{pdfsubject=\@subject}%
+    }{
+    }{
+      \PackageWarningFailedPatching{\mhp@mhpmain}{\HyOrg@maketitle}
+    }
+  }{
+  }
+}{
+}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\def\do#1#2{%
+  \patchcmd{#1}#2{}{\PackageWarningFailedPatching{\mhp@mhpmain}{#1}}%
+}
+
+
+\forcsvlist{\do{\HyLang@english}}{
+  {{{footnote}}     {{Footnote}}},
+  {{{item}}         {{Item}}},
+  {{{chapter}}      {{Chapter}}},
+  {{{section}}      {{Section}}},
+  {{{subsection}}   {{Subsection}}},
+  {{{subsubsection}}{{Subsection}}},
+  {{{paragraph}}    {{Paragraph}}},
+  {{{subparagraph}} {{Paragraph}}},
+  {{{line}}         {{Line}}},
+  {{{page}}         {{Page}}},
+}
+
+
+\forcsvlist{\do{\HyLang@german}}{
+  {{{Unterunterabschnitt}}{{Unterabschnitt}}},
+  {{{Unterabsatz}}        {{Absatz}}},
+}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\pdfstringdefDisableCommands{%
+  \let\,\@empty
+  \let\thinspace\,%
+  \let\:\@empty
+  \let\medspace\:%
+  \HyPsd@LetUnexpandableSpace\;%
+  \HyPsd@LetUnexpandableSpace\thickspace
+  \HyPsd@LetUnexpandableSpace\hardbreakspace
+  \def\hyphen{-}%
+  \let\nbhyphen\hyphen
+  \let\hbhyphen\hyphen
+  \letcs{\textendash}{\f@encoding\string\textendash}%
+  \letcs{\textemdash}{\f@encoding\string\textemdash}%
+  \letcs{\textfractionsolidus}{\f@encoding\string\textfractionsolidus}%
+  \let\textellipsis\textellipsis@orig
+  \let\ldots\textellipsis
+  \let\dots\textellipsis
+  \let\@\relax
+  \let\kerning\ltx@gobbletwo
+  \let\mhp@terminal\ltx@gobble
+  \let\\\newline@pdfstringdef
+  \let\nohyphens\ltx@firstofone
+  \let\thispagestyle\ltx@gobble
+  \def\and{, }%
+  \let\thanks\ltx@gobble
+  \def\BibTeX{BibTeX}%
+  \let\acronymfont\ltx@firstofone
+  \let\noacronymfont\ltx@firstofone
+}
+
+
+\patchcmd{\pdfstringdef}{%
+  \HyPsd@Subst{?`}\textquestiondown#1%
+}{%
+  \HyPsd@Subst{?`}\textquestiondown#1%
+  \HyPsd@Subst{``}\textquotedblleft#1%
+  \HyPsd@Subst`\textquoteleft#1%
+  \HyPsd@Subst{''}\textquotedblright#1%
+  \HyPsd@Subst'\textquoteright#1%
+  \HyPsd@Subst{,,}\quotedblbase#1%
+  \ifpdfstringunicode{%
+    \expandafter\HyPsd@StringSubst\csname9040\020\endcsname\hyphen#1%
+    \expandafter\HyPsd@StringSubst\csname9040\021\endcsname\nbhyphen#1%
+  }{%
+  }%
+}{
+}{
+  \PackageWarningFailedPatching{\mhp@mhpmain}{\pdfstringdef}
+}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\bookmarksetup{open, openlevel=1, numbered}
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+\endinput
+
+
+%%---------------------------------------------------------------------------------------------------------------------------%%
+
+
+%% LocalWords: mhpmain esint intlimits amsmath hyperref pdfencoding unicode textendash ifundef nocorr tabularx acronymfont
+%% LocalWords: noacronymfont footnotemark footnotetext nocorrlist newunicodechar inputenx
